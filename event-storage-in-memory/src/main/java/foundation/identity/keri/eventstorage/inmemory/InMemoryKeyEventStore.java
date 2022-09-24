@@ -3,23 +3,13 @@ package foundation.identity.keri.eventstorage.inmemory;
 import foundation.identity.keri.KeyEventStore;
 import foundation.identity.keri.KeyStateProcessor;
 import foundation.identity.keri.api.KeyState;
-import foundation.identity.keri.api.event.AttachmentEvent;
-import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.KeyEvent;
-import foundation.identity.keri.api.event.KeyEventCoordinates;
-import foundation.identity.keri.api.event.SealingEvent;
+import foundation.identity.keri.api.event.*;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.crypto.Digest;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.crypto.Signature;
-import foundation.identity.keri.internal.event.ImmutableKeyEventCoordinates;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.OptionalLong;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
@@ -64,11 +54,15 @@ public class InMemoryKeyEventStore implements KeyEventStore {
       this.receipts.computeIfAbsent(key, k -> new HashMap<>())
           .putAll(otherReceipt.getValue());
     }
- }
+  }
 
   @Override
   public void append(AttachmentEvent event) {
-    this.appendAttachments(event.coordinates(), event.authentication(), event.endorsements(), event.receipts());
+    this.appendAttachments(event.coordinates(),
+        event.authentication(),
+        event.endorsements(),
+        event.receipts()
+    );
   }
 
   @Override
@@ -77,8 +71,8 @@ public class InMemoryKeyEventStore implements KeyEventStore {
         .filter(e -> e.identifier().equals(coordinates.identifier()))
         .filter(e -> e.sequenceNumber() == coordinates.sequenceNumber())
         .filter(e -> e.previous().digest().equals(coordinates.previousEvent().digest()))
-        .filter(e -> e instanceof SealingEvent)
-        .map(e -> (SealingEvent) e)
+        .filter(SealingEvent.class::isInstance)
+        .map(SealingEvent.class::cast)
         .findFirst();
   }
 
@@ -89,7 +83,7 @@ public class InMemoryKeyEventStore implements KeyEventStore {
         .filter(e -> e.sequenceNumber() == coordinates.sequenceNumber())
         .filter(e ->
             Digest.equals(e.digest(), coordinates.digest())
-              || DigestOperations.matches(e.bytes(), coordinates.digest()))
+                || DigestOperations.matches(e.bytes(), coordinates.digest()))
         .findFirst();
   }
 
@@ -120,8 +114,7 @@ public class InMemoryKeyEventStore implements KeyEventStore {
   }
 
   @Override
-  public OptionalLong findLatestReceipt(
-      Identifier forIdentifier, Identifier byIdentifier) {
+  public OptionalLong findLatestReceipt(Identifier forIdentifier, Identifier byIdentifier) {
     return this.receipts.keySet()
         .stream()
         .filter(receiptKey -> receiptKey.event().identifier().equals(forIdentifier))
@@ -130,40 +123,6 @@ public class InMemoryKeyEventStore implements KeyEventStore {
         .max();
   }
 
-  private static class ReceiptKey {
-    private final KeyEventCoordinates event;
-    private final KeyEventCoordinates signer;
-
-    public ReceiptKey(KeyEventCoordinates event, KeyEventCoordinates signer) {
-      this.event = ImmutableKeyEventCoordinates.convert(event);
-      this.signer = ImmutableKeyEventCoordinates.convert(signer);
-    }
-
-    public KeyEventCoordinates event() {
-      return this.event;
-    }
-
-    public KeyEventCoordinates signer() {
-      return this.signer;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) {
-        return true;
-      }
-      if (!(o instanceof ReceiptKey)) {
-        return false;
-      }
-      ReceiptKey that = (ReceiptKey) o;
-      return this.event.equals(that.event)
-          && this.signer.equals(that.signer);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(this.event, this.signer);
-    }
+  private record ReceiptKey(KeyEventCoordinates event, KeyEventCoordinates signer) {
   }
-
 }
