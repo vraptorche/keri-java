@@ -182,5 +182,14 @@
 			</plugin>
 		</plugins>
 	</build>
-
+  <distributionManagement>
+    <snapshotRepository>
+      <id>jware-nexus-snapshots</id>
+      <url>https://nexus.jurassicware.com:8443/repository/jware-snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>jware-nexus-releases</id>
+      <url>https://nexus.jurassicware.com:8443/repository/jware-release</url>
+    </repository>
+  </distributionManagement>
 </project>

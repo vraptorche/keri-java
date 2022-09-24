@@ -17,12 +17,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
-                nexusArtifactUploader credentialsId: 'jenkins.jware.co',
-                                      groupId: 'foundation.identity.keri',
-                                      nexusUrl: 'nexus.jurassicware.com:8443',
-                                      nexusVersion: 'nexus3', protocol: 'https',
-                                      repository: 'jware-snapshots',
-                                      version: '0.0.1-SNAPSHOT'
+                sh 'mvn jar:jar deploy:deploy'
             }
         }
     }
