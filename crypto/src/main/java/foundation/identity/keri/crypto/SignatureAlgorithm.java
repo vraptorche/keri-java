@@ -13,12 +13,11 @@ public interface SignatureAlgorithm {
       return false;
     }
 
-    if (!(o instanceof SignatureAlgorithm)) {
+    if (!(o instanceof SignatureAlgorithm otherAlgorithm)) {
       return false;
     }
 
-    var otherAlgorithm = (SignatureAlgorithm) o;
-    return algorithm.algorithmName().equals(otherAlgorithm.algorithmName())
+	  return algorithm.algorithmName().equals(otherAlgorithm.algorithmName())
         && algorithm.parameters().equals(otherAlgorithm.parameters());
   }
 
