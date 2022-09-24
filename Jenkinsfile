@@ -6,7 +6,7 @@ pipeline {
             steps {
                 echo 'Building..'
                 checkout scm
-                sh 'mvn clean install'
+                sh 'mvn clean verify'
             }
         }
         stage('Test') {
