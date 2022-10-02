@@ -21,6 +21,7 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
+      <version>4.1.82.Final</version>
     </dependency>
 
     <!-- TEST DEPENDENCIES -->
@@ -40,6 +41,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <version>1.4.1</version>
       <scope>test</scope>
     </dependency>
 

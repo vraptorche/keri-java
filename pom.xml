@@ -1,184 +1,211 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<groupId>foundation.identity.keri</groupId>
-	<artifactId>root</artifactId>
-	<version>0.2-SNAPSHOT</version>
-	<packaging>pom</packaging>
+  <groupId>foundation.identity.keri</groupId>
+  <artifactId>root</artifactId>
+  <version>0.2-SNAPSHOT</version>
+  <packaging>pom</packaging>
 
-	<name>root</name>
+  <name>root</name>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>LICENSE</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-	<scm>
-		<developerConnection>https://github.com/vraptorche/keri-java.git</developerConnection>
-		<url>https://github.com/vraptorche/keri-java.git</url>
-		<connection>git://github.com/vraptorche/keri-java.git</connection>
-	</scm>
+  <scm>
+    <developerConnection>https://github.com/vraptorche/keri-java.git</developerConnection>
+    <url>https://github.com/vraptorche/keri-java.git</url>
+    <connection>git://github.com/vraptorche/keri-java.git</connection>
+  </scm>
 
-	<issueManagement>
-		<system>GitHub</system>
-		<url>http://github.com/vraptorche/keri-java/issues</url>
-	</issueManagement>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>http://github.com/vraptorche/keri-java/issues</url>
+  </issueManagement>
 
-	<modules>
-		<module>controller</module>
-		<module>controller-cli</module>
-		<module>crypto</module>
-		<module>event-storage-in-memory</module>
-		<module>key-storage-in-memory</module>
-		<module>log</module>
-		<module>lookup</module>
-		<module>transport-tcp</module>
-	</modules>
+  <modules>
+    <module>controller</module>
+    <module>controller-cli</module>
+    <module>crypto</module>
+    <module>event-storage-in-memory</module>
+    <module>key-storage-in-memory</module>
+    <module>log</module>
+    <module>lookup</module>
+    <module>transport-tcp</module>
+    <module>event-storage-ipfs</module>
+    <module>key-storage-ipfs</module>
+  </modules>
 
-	<properties>
-		<bouncycastle.version>1.71</bouncycastle.version>
-		<commons.math3.version>3.6.1</commons.math3.version>
-		<jackson.version>2.13.3</jackson.version>
-		<junit.version>4.13.2</junit.version>
-		<logback.version>1.2.3</logback.version>
-		<msgpack.jackson.version>0.9.3</msgpack.jackson.version>
-		<netty.version>4.1.79.Final</netty.version>
-		<rctcwyvrn.blake3.version>1.3</rctcwyvrn.blake3.version>
-		<slf4j.version>1.7.36</slf4j.version>
-		<java.version>17</java.version>
-		<maven.compiler.source>17</maven.compiler.source>
-		<maven.compiler.target>17</maven.compiler.target>
-		<maven.compiler.release>17</maven.compiler.release>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  <properties>
+    <bouncycastle.version>1.71</bouncycastle.version>
+    <commons.math3.version>3.6.1</commons.math3.version>
+    <jackson.version>2.13.3</jackson.version>
+    <junit.version>4.13.2</junit.version>
+    <logback.version>1.2.3</logback.version>
+    <msgpack.jackson.version>0.9.3</msgpack.jackson.version>
+    <netty.version>4.1.79.Final</netty.version>
+    <rctcwyvrn.blake3.version>1.3</rctcwyvrn.blake3.version>
+    <slf4j.version>1.7.36</slf4j.version>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.release>17</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jacoco.version>0.8.8</jacoco.version>
-	</properties>
+  </properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>controller</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>controller</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>controller-cli</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>controller-cli</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>crypto</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>crypto</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>event-storage-in-memory</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>event-storage-in-memory</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>key-storage-in-memory</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>key-storage-in-memory</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>log</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>log</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>lookup</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>lookup</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>foundation.identity.keri</groupId>
-				<artifactId>transport-tcp</artifactId>
-				<version>${project.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>foundation.identity.keri</groupId>
+        <artifactId>transport-tcp</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>ch.qos.logback</groupId>
-				<artifactId>logback-classic</artifactId>
-				<version>${logback.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
-				<artifactId>jackson-bom</artifactId>
-				<version>${jackson.version}</version>
-				<scope>import</scope>
-				<type>pom</type>
-			</dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>${jackson.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
 
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.version}</version>
-				<scope>test</scope>
-			</dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
 
-			<dependency>
-				<groupId>io.github.rctcwyvrn</groupId>
-				<artifactId>blake3</artifactId>
-				<version>${rctcwyvrn.blake3.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>io.github.rctcwyvrn</groupId>
+        <artifactId>blake3</artifactId>
+        <version>${rctcwyvrn.blake3.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>io.netty</groupId>
-				<artifactId>netty-bom</artifactId>
-				<version>${netty.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-bom</artifactId>
+        <version>${netty.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-math3</artifactId>
-				<version>${commons.math3.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-math3</artifactId>
+        <version>${commons.math3.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.bouncycastle</groupId>
-				<artifactId>bcprov-jdk15to18</artifactId>
-				<version>${bouncycastle.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15to18</artifactId>
+        <version>${bouncycastle.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.msgpack</groupId>
-				<artifactId>jackson-dataformat-msgpack</artifactId>
-				<version>${msgpack.jackson.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.msgpack</groupId>
+        <artifactId>jackson-dataformat-msgpack</artifactId>
+        <version>${msgpack.jackson.version}</version>
+      </dependency>
 
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-api</artifactId>
-				<version>${slf4j.version}</version>
-			</dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
 
-		</dependencies>
-	</dependencyManagement>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
-				<configuration>
-					<release>17</release>
-				</configuration>
-			</plugin>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.10.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.frgaal</groupId>
+            <artifactId>compiler-maven-plugin</artifactId>
+            <version>19.0.0</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <compilerId>frgaal</compilerId>
+          <source>19</source>
+          <target>11</target>
+          <compilerArgs>
+            <arg>-Xlint:deprecation</arg>
+<!--                        <arg>&#45;&#45;enable-preview</arg> &lt;!&ndash;only needed when using preview language features&ndash;&gt;-->
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Multi-Release>true</Multi-Release>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>com.amashchenko.maven.plugin</groupId>
         <artifactId>gitflow-maven-plugin</artifactId>
@@ -217,8 +244,8 @@
           </execution>
         </executions>
       </plugin>
-		</plugins>
-	</build>
+    </plugins>
+  </build>
   <distributionManagement>
     <snapshotRepository>
       <id>jware-nexus-snapshots</id>
