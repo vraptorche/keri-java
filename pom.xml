@@ -48,7 +48,7 @@
     <bouncycastle.version>1.72</bouncycastle.version>
     <commons.math3.version>3.6.1</commons.math3.version>
     <jackson.version>2.14.1</jackson.version>
-    <junit.version>4.13.2</junit.version>
+    <jupiter.version>5.9.2</jupiter.version>
     <logback.version>1.4.5</logback.version>
     <msgpack.jackson.version>0.9.3</msgpack.jackson.version>
     <netty.version>4.1.87.Final</netty.version>
@@ -126,14 +126,18 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>${jupiter.version}</version>
         <scope>test</scope>
       </dependency>
-
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-params</artifactId>
+        <version>${jupiter.version}</version>
+        <scope>test</scope>
+      </dependency>
       <dependency>
         <groupId>io.github.rctcwyvrn</groupId>
         <artifactId>blake3</artifactId>

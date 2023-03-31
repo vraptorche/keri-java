@@ -12,16 +12,16 @@ import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
 import foundation.identity.keri.internal.seal.ImmutableKeyEventCoordinatesSeal;
 import foundation.identity.keri.internal.seal.ImmutableMerkleTreeRootSeal;
 import foundation.identity.keri.keystorage.inmemory.InMemoryIdentifierKeyStore;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.List;
 
 import static foundation.identity.keri.SigningThresholds.unweighted;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerTests {
 
@@ -29,13 +29,13 @@ public class ControllerTests {
   final InMemoryKeyEventStore testEventStore = new InMemoryKeyEventStore();
   final InMemoryIdentifierKeyStore testKeyStore = new InMemoryIdentifierKeyStore();
 
-  @BeforeClass
+  @BeforeAll
   public static void beforeClass() {
     // secp256k1 is considered "unsecure" so you have enable it like this:
     System.setProperty("jdk.sunec.disableNative", "false");
   }
 
-  @Before
+  @BeforeEach
   public void beforeEachTest() throws NoSuchAlgorithmException {
     // this makes the values of secureRandom deterministic
     this.secureRandom = SecureRandom.getInstance("SHA1PRNG");
@@ -43,7 +43,7 @@ public class ControllerTests {
   }
 
   @Test
-  public void test_newPrivateIdentifier() {
+   void test_newPrivateIdentifier() {
     var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
 
     var i = controller.newPrivateIdentifier();
@@ -104,7 +104,7 @@ public class ControllerTests {
   }
 
   @Test
-  public void test_privateIdentifier_rotate() {
+   void test_privateIdentifier_rotate() {
     var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
 
     var i = controller.newPrivateIdentifier();
@@ -123,7 +123,7 @@ public class ControllerTests {
   }
 
   @Test
-  public void test_privateIdentifier_interaction() {
+   void test_privateIdentifier_interaction() {
     var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
 
     var i = controller.newPrivateIdentifier();

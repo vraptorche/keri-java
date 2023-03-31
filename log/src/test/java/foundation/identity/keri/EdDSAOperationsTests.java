@@ -1,8 +1,8 @@
 package foundation.identity.keri;
 
 import foundation.identity.keri.crypto.SignatureOperations;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.security.GeneralSecurityException;
@@ -14,18 +14,18 @@ import java.security.spec.EdECPrivateKeySpec;
 import java.security.spec.EdECPublicKeySpec;
 import java.security.spec.NamedParameterSpec;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class EdDSAOperationsTests {
+ class EdDSAOperationsTests {
 
-  @BeforeClass
-  public static void beforeClass() {
+  @BeforeAll
+   static void beforeClass() {
     // secp256k1 is considered "unsecure" so you have enable it like this:
     System.setProperty("jdk.sunec.disableNative", "false");
   }
 
   @Test
-  public void test_ED25519_generateKeyPair() {
+   void test_ED25519_generateKeyPair() {
     var ops = SignatureOperations.ED_25519;
     var result = ops.generateKeyPair();
 
@@ -34,7 +34,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED25519_encode() throws GeneralSecurityException {
+   void test_ED25519_encode() throws GeneralSecurityException {
     var point = new EdECPoint(false,
         new BigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c", 16));
     var keyFactory = KeyFactory.getInstance("Ed25519");
@@ -49,7 +49,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED25519_decode() {
+   void test_ED25519_decode() {
     var encoded = Hex.unhex("0c7f50c3260bf7ede3e6cafbf0a5b096c853bdd112117cc44f3498671fe69107");
 
     var ops = SignatureOperations.ED_25519;
@@ -65,7 +65,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED25519_encodeDecodeRoundtrip() throws GeneralSecurityException {
+   void test_ED25519_encodeDecodeRoundtrip() throws GeneralSecurityException {
     final var ecPointY = new BigInteger("791e61f6798344fc47c1112d1bd53c896b0a5f0fbcae6e3edf70b26c3507f0c", 16);
     var point = new EdECPoint(false, ecPointY);
     var keyFactory = KeyFactory.getInstance("Ed25519");
@@ -86,7 +86,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED25519_decodeEncodeRoundtrip() {
+   void test_ED25519_decodeEncodeRoundtrip() {
     var encoded = Hex.unhex("0c7f50c3260bf7ede3e6cafbf0a5b096c853bdd112117cc44f3498671fe69107");
 
     var ops = SignatureOperations.ED_25519;
@@ -97,7 +97,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED25519_signVerify() throws GeneralSecurityException {
+   void test_ED25519_signVerify() throws GeneralSecurityException {
     var skb = Hex.unhex("4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb");
     var pkb = Hex.unhex("3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c");
     var msg = Hex.unhex("72");
@@ -118,7 +118,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED448_generateKeyPair() {
+   void test_ED448_generateKeyPair() {
     var ops = SignatureOperations.ED_448;
     var result = ops.generateKeyPair();
 
@@ -127,7 +127,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED448_encode() throws GeneralSecurityException {
+   void test_ED448_encode() throws GeneralSecurityException {
     var point = new EdECPoint(true,
         new BigInteger(
             "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf", 16));
@@ -144,7 +144,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED448_decode() {
+   void test_ED448_decode() {
     var encoded = Hex.unhex(
         "af9bf36a4bb8f12144f1459972bd05db22d6c318ebda9637f5a804dbf0fca2793fd8e78d646542fce6b16d6285b3b33d6fca0d64ca3d06c580");
 
@@ -162,7 +162,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED448_encodeDecodeRoundtrip() throws GeneralSecurityException {
+   void test_ED448_encodeDecodeRoundtrip() throws GeneralSecurityException {
     final var ecPointY = new BigInteger(
         "c5063dca640dca6f3db3b385626db1e6fc4265648de7d83f79a2fcf0db04a8f53796daeb18c3d622db05bd729945f14421f1b84b6af39baf", 16);
     var point = new EdECPoint(true, ecPointY);
@@ -184,7 +184,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED448_decodeEncodeRoundtrip() {
+   void test_ED448_decodeEncodeRoundtrip() {
     var encoded = Hex.unhex(
         "f35ec70547678147cd6fc0bec2e31a35b37adfba1fee705372f3586ceea6a82236d32a2da37eaca4e30b6e3e6926c1de98d4583cfcff243500");
 
@@ -196,7 +196,7 @@ public class EdDSAOperationsTests {
   }
 
   @Test
-  public void test_ED448_signVerify() throws GeneralSecurityException {
+   void test_ED448_signVerify() throws GeneralSecurityException {
     var skb = Hex.unhex(
         "61768c7a6fb18b9c257e72fdc8f4e40c62dec41380ec87f30f1865e156838c7694b7ce53dd6882d882559447fde7fcc86f3928fa8d8ac81b22");
     var pkb = Hex.unhex(
