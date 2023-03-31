@@ -2,9 +2,9 @@ package foundation.identity.keri;
 
 import foundation.identity.keri.crypto.EcDSAOperations;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
@@ -12,34 +12,29 @@ import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPrivateKeySpec;
-import java.security.spec.ECPublicKeySpec;
+import java.security.spec.*;
 
-import static com.sun.net.httpserver.spi.HttpServerProvider.provider;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class EcDSAOperationsTests {
+ class EcDSAOperationsTests {
 
 	ECParameterSpec parameterSpec;
 
-	@BeforeClass
-	public static void beforeClass() {
+	@BeforeAll
+	 static void beforeClass() {
 		// secp256k1 is considered "unsecure" so you have enable it like this:
 		System.setProperty("jdk.sunec.disableNative", "false");
 	}
 
-	@Before
-	public void setUp() throws GeneralSecurityException {
+	@BeforeEach
+	 void setUp() throws GeneralSecurityException {
 		var ap = AlgorithmParameters.getInstance("EC", new BouncyCastleProvider());
 		ap.init(new ECGenParameterSpec("secp256k1"));
 		this.parameterSpec = ap.getParameterSpec(ECParameterSpec.class);
 	}
 
 	@Test
-	public void test_EC_SECP256K1_generateKeyPair() {
+	 void test_EC_SECP256K1_generateKeyPair() {
 		var ops = EcDSAOperations.EC_SECP256K1;
 		var result = ops.generateKeyPair();
 
@@ -48,7 +43,7 @@ public class EcDSAOperationsTests {
 	}
 
 	@Test
-	public void test_EC_SECP256K1_encode() throws GeneralSecurityException {
+	 void test_EC_SECP256K1_encode() throws GeneralSecurityException {
 		var w = new ECPoint(
 				new BigInteger("c34404f02d7db7382b9ab4c9afd1f6899a8146b694f52b4642d7f083db53c8e0", 16),
 				new BigInteger("e17c8a229704c4b0337e84b0fae73d3d4c0870b009ba77a7f000681d3862f88f", 16));
@@ -65,7 +60,7 @@ public class EcDSAOperationsTests {
 	}
 
 	@Test
-	public void test_EC_SECP256K1_decode() {
+	 void test_EC_SECP256K1_decode() {
 		var encoded = Hex.unhex(
 				"03c34404f02d7db7382b9ab4c9afd1f6899a8146b694f52b4642d7f083db53c8e0");
 
@@ -83,7 +78,7 @@ public class EcDSAOperationsTests {
 	}
 
 	@Test
-	public void test_EC_SECP256K1_encodeDecodeRoundtrip() throws GeneralSecurityException {
+	 void test_EC_SECP256K1_encodeDecodeRoundtrip() throws GeneralSecurityException {
 		var w = new ECPoint(
 				new BigInteger("c34404f02d7db7382b9ab4c9afd1f6899a8146b694f52b4642d7f083db53c8e0", 16),
 				new BigInteger("e17c8a229704c4b0337e84b0fae73d3d4c0870b009ba77a7f000681d3862f88f", 16));
@@ -105,7 +100,7 @@ public class EcDSAOperationsTests {
 	}
 
 	@Test
-	public void test_EC_SECP256K1_decodeEncodeRoundtrip() {
+	 void test_EC_SECP256K1_decodeEncodeRoundtrip() {
 		var encoded = Hex.unhex(
 				"03c34404f02d7db7382b9ab4c9afd1f6899a8146b694f52b4642d7f083db53c8e0");
 
@@ -117,7 +112,7 @@ public class EcDSAOperationsTests {
 	}
 
 	@Test
-	public void test_EC_SECP256K1_signVerify() throws GeneralSecurityException {
+	 void test_EC_SECP256K1_signVerify() throws GeneralSecurityException {
 		var skb = new BigInteger("00eb33adf5364133e53e43291bccb799cf24024ecb09547a4210b44e4e28936187", 16);
 		var pkb = Hex.unhex(
 				"04c34404f02d7db7382b9ab4c9afd1f6899a8146b694f52b4642d7f083db53c8e0e17c8a229704c4b0337e84b0fae73d3d4c0870b009ba77a7f000681d3862f88f");

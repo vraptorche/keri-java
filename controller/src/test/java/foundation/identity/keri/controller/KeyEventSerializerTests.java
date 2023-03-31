@@ -1,21 +1,20 @@
 package foundation.identity.keri.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import static foundation.identity.keri.SigningThresholds.*;
 import static foundation.identity.keri.controller.KeyEventSerializer.signingThreshold;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class KeyEventSerializerTests {
+ class KeyEventSerializerTests {
 
   final ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  public void signingThreshold__unweighted() {
-    assertEquals(
-        "\"1\"",
-        signingThreshold(unweighted(1), this.mapper).toString());
+   void signingThreshold__unweighted() {
+    assertEquals("\"1\"", signingThreshold(unweighted(1), this.mapper).toString());
 
     assertEquals(
         "\"2\"",
@@ -27,7 +26,7 @@ public class KeyEventSerializerTests {
   }
 
   @Test
-  public void signingThreshold__weighted() {
+   void signingThreshold__weighted() {
 
     // ["1/2", "1/2", "1/4", "1/4", "1/4"]
     assertEquals(

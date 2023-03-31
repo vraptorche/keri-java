@@ -3,19 +3,20 @@ package foundation.identity.keri.controller.spec;
 import foundation.identity.keri.SigningThresholds;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.crypto.SignatureOperations;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 import static foundation.identity.keri.SigningThresholds.weight;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IdentifierSpecTests {
+ class IdentifierSpecTests {
 
   SecureRandom deterministicRandom;
   KeyPair keyPair;
@@ -23,14 +24,14 @@ public class IdentifierSpecTests {
   KeyPair keyPair2;
   PrivateKeySigner signer2;
 
-  @BeforeClass
-  public static void beforeClass() {
+  @BeforeAll
+   static void beforeClass() {
     // secp256k1 is considered "unsecure" so you have enable it like this:
     System.setProperty("jdk.sunec.disableNative", "false");
   }
 
-  @Before
-  public void beforeEachTest() throws NoSuchAlgorithmException {
+  @BeforeEach
+   void beforeEachTest() throws NoSuchAlgorithmException {
     // this makes the values of secureRandom deterministic
     this.deterministicRandom = SecureRandom.getInstance("SHA1PRNG");
     this.deterministicRandom.setSeed(new byte[]{0});
@@ -44,31 +45,31 @@ public class IdentifierSpecTests {
   }
 
   @Test
-  public void test__builder__signingThreshold__int() {
+   void test__builder__signingThreshold__int() {
     var spec = IdentifierSpec.builder()
         .key(this.keyPair.getPublic())
         .signer(this.signer)
         .signingThreshold(1)
         .build();
 
-    assertTrue("type", spec.signingThreshold() instanceof SigningThreshold.Unweighted);
+    assertTrue( spec.signingThreshold() instanceof SigningThreshold.Unweighted,"type");
     assertEquals(1, ((SigningThreshold.Unweighted) spec.signingThreshold()).threshold());
   }
 
   @Test
-  public void test__builder__signingThreshold__unweighted() {
+   void test__builder__signingThreshold__unweighted() {
     var spec = IdentifierSpec.builder()
         .key(this.keyPair.getPublic())
         .signer(this.signer)
         .signingThreshold(SigningThresholds.unweighted(1))
         .build();
 
-    assertTrue("type", spec.signingThreshold() instanceof SigningThreshold.Unweighted);
+    assertTrue(spec.signingThreshold() instanceof SigningThreshold.Unweighted, "type");
     assertEquals(1, ((SigningThreshold.Unweighted) spec.signingThreshold()).threshold());
   }
 
   @Test
-  public void test__builder__signingThreshold__weighted() {
+   void test__builder__signingThreshold__weighted() {
     var spec = IdentifierSpec.builder()
         .key(this.keyPair.getPublic())
         .key(this.keyPair2.getPublic())
@@ -76,7 +77,7 @@ public class IdentifierSpecTests {
         .signingThreshold(SigningThresholds.weighted("1", "2"))
         .build();
 
-    assertTrue("type", spec.signingThreshold() instanceof SigningThreshold.Weighted);
+    assertTrue(spec.signingThreshold() instanceof SigningThreshold.Weighted, "type");
     var weights = ((SigningThreshold.Weighted) spec.signingThreshold()).weights();
     assertEquals(weight(1), weights[0][0]);
     assertEquals(weight(2), weights[0][1]);

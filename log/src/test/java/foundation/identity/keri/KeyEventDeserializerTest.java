@@ -2,18 +2,19 @@ package foundation.identity.keri;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import static foundation.identity.keri.KeyEventDeserializer.readSigningThreshold;
 import static foundation.identity.keri.SigningThresholds.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class KeyEventDeserializerTest {
+ class KeyEventDeserializerTest {
 
   final ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  public void test__readSigningThreshold__unweighted() throws JsonProcessingException {
+   void test__readSigningThreshold__unweighted() throws JsonProcessingException {
     assertEquals(
         unweighted(1),
         readSigningThreshold(this.mapper.readTree("\"1\"")));
@@ -28,7 +29,7 @@ public class KeyEventDeserializerTest {
   }
 
   @Test
-  public void test__readSigningThreshold__weighted() throws JsonProcessingException {
+   void test__readSigningThreshold__weighted() throws JsonProcessingException {
 
     // ["1/2", "1/2", "1/4", "1/4", "1/4"]
     assertEquals(

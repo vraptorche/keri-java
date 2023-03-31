@@ -2,17 +2,18 @@ package foundation.identity.keri;
 
 import foundation.identity.keri.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import java.util.Base64;
 
 import static foundation.identity.keri.QualifiedBase64.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class QualifiedBase64Tests {
+ class QualifiedBase64Tests {
 
   @Test
-  public void test__base64__bytea() {
+   void test__base64__bytea() {
     assertEquals("AA", base64(new byte[]{0x00}));
     assertEquals("AAE", base64(new byte[]{0x00, 0x01}));
     assertEquals("AAEC", base64(new byte[]{0x00, 0x01, 0x02}));
@@ -20,7 +21,7 @@ public class QualifiedBase64Tests {
   }
 
   @Test
-  public void test__unbase64() {
+   void test__unbase64() {
     assertArrayEquals(new byte[]{0x00}, unbase64("AA"));
     assertArrayEquals(new byte[]{0x00, 0x01}, unbase64("AAE"));
     assertArrayEquals(new byte[]{0x00, 0x01, 0x02}, unbase64("AAEC"));
@@ -28,7 +29,7 @@ public class QualifiedBase64Tests {
   }
 
   @Test
-  public void test__base64__int() {
+   void test__base64__int() {
     assertEquals("A", base64(0));
     assertEquals("B", base64(1));
     assertEquals("C", base64(2));
@@ -46,7 +47,7 @@ public class QualifiedBase64Tests {
   }
 
   @Test
-  public void test__base64__int_padding() {
+   void test__base64__int_padding() {
     assertEquals("AA", base64(0, 2));
     assertEquals("AAA", base64(0, 3));
     assertEquals("AAAA", base64(0, 4));
@@ -66,7 +67,7 @@ public class QualifiedBase64Tests {
   }
 
   @Test
-  public void test__unbase64Int() {
+   void test__unbase64Int() {
     assertEquals(0, unbase64Int("A"));
     assertEquals(1, unbase64Int("B"));
     assertEquals(2, unbase64Int("C"));
@@ -84,7 +85,7 @@ public class QualifiedBase64Tests {
   }
 
   @Test
-  public void test__qb64Length() {
+   void test__qb64Length() {
     var enc = Base64.getUrlEncoder();
     assertEquals(enc.encodeToString(new byte[0]).length() + 4, qb64Length(0));
     assertEquals(enc.encodeToString(new byte[1]).length(), qb64Length(1));
@@ -99,38 +100,33 @@ public class QualifiedBase64Tests {
   }
 
   @Test
-  public void test__basicIdentifierPlaceholder() {
+   void test__basicIdentifierPlaceholder() {
     for (var a : StandardSignatureAlgorithms.values()) {
       var placeholder = basicIdentifierPlaceholder(a);
-      assertEquals(
-          a.name() + " placeholder length",
-          qb64Length(a.publicKeyLength()),
-          placeholder.length());
-      assertTrue("contains only #", placeholder.matches("^#+$"));
+      assertEquals(qb64Length(a.publicKeyLength()),
+          placeholder.length(), a.name() + " placeholder length");
+      assertTrue(placeholder.matches("^#+$"), "contains only #");
     }
   }
 
   @Test
-  public void test__selfAddressingIdentifierPlaceholder() {
+   void test__selfAddressingIdentifierPlaceholder() {
     for (var a : StandardDigestAlgorithms.values()) {
       var placeholder = selfAddressingIdentifierPlaceholder(a);
-      assertEquals(
-          a.name() + " placeholder length",
-          qb64Length(a.digestLength()),
-          placeholder.length());
-      assertTrue("contains only #", placeholder.matches("^#+$"));
+      assertEquals(qb64Length(a.digestLength()),
+          placeholder.length(), a.name() + " placeholder length");
+      assertTrue(placeholder.matches("^#+$"), "contains only #");
     }
   }
 
   @Test
-  public void test__selfSigningIdentifierPlaceholder() {
+   void test__selfSigningIdentifierPlaceholder() {
     for (var a : StandardSignatureAlgorithms.values()) {
       var placeholder = selfSigningIdentifierPlaceholder(a);
-      assertEquals(
-          a.name() + " placeholder length",
-          qb64Length(a.signatureLength()),
-          placeholder.length());
-      assertTrue("contains only #", placeholder.matches("^#+$"));
+      assertEquals(qb64Length(a.signatureLength()),
+          placeholder.length(),
+          a.name() + " placeholder length");
+      assertTrue(placeholder.matches("^#+$"), "contains only #");
     }
   }
 
