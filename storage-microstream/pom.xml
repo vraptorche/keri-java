@@ -5,7 +5,7 @@
   <parent>
     <groupId>foundation.identity.keri</groupId>
     <artifactId>root</artifactId>
-    <version>0.2-junit5-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
   </parent>
   <artifactId>storage-microstream</artifactId>
   <packaging>pom</packaging>
