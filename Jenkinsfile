@@ -21,11 +21,15 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-            jacoco execPattern: '**/target/**.exec'
-            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-        }
-    }
+   post {
+           success {
+               junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+               jacoco execPattern: '**/target/**.exec'
+               archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+               cleanWs()
+           }
+           failure {
+               cleanWs()
+           }
+       }
 }
