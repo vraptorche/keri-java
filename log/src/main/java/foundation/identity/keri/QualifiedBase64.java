@@ -35,6 +35,12 @@ public final class QualifiedBase64 {
   };
 
   private static final int[] BASE64_REVERSE_LOOKUP;
+  public static final String UNRECOGNIZED_IDENTIFIER = "Unrecognized identifier: ";
+  public static final String UNKNOWN_CODE = "unknown code: ";
+  public static final String UNRECOGNIZED_PUBLIC_KEY = "Unrecognized public key: ";
+  public static final String UNRECOGNIZED_DIGEST = "Unrecognized digest: ";
+  public static final String UNRECOGNIZED_SIGNATURE = "Unrecognized signature: ";
+  public static final String PREFIX_REGEX = "^[0-6-]";
 
   static {
     BASE64_REVERSE_LOOKUP = new int[128];
@@ -82,16 +88,13 @@ public final class QualifiedBase64 {
   }
 
   public static String identifierPlaceholder(Identifier identifier) {
-    if (identifier instanceof BasicIdentifier) {
-      var bp = (BasicIdentifier) identifier;
-      var signatureAlgorithm = StandardSignatureAlgorithms.lookup(bp.publicKey());
+    if (identifier instanceof BasicIdentifier bid) {
+      var signatureAlgorithm = StandardSignatureAlgorithms.lookup(bid.publicKey());
       return basicIdentifierPlaceholder(signatureAlgorithm);
-    } else if (identifier instanceof SelfAddressingIdentifier) {
-      var sap = (SelfAddressingIdentifier) identifier;
-      return selfAddressingIdentifierPlaceholder(sap.digest().algorithm());
-    } else if (identifier instanceof SelfSigningIdentifier) {
-      var ssp = (SelfSigningIdentifier) identifier;
-      return selfSigningIdentifierPlaceholder(ssp.signature().algorithm());
+    } else if (identifier instanceof SelfAddressingIdentifier said) {
+      return selfAddressingIdentifierPlaceholder(said.digest().algorithm());
+    } else if (identifier instanceof SelfSigningIdentifier ssid) {
+      return selfSigningIdentifierPlaceholder(ssid.signature().algorithm());
     } else {
       throw new IllegalArgumentException("unknown prefix type: " + identifier.getClass().getCanonicalName());
     }
@@ -164,7 +167,7 @@ public final class QualifiedBase64 {
       case "0B" -> StandardSignatureAlgorithms.ED_25519;
       case "0C" -> StandardSignatureAlgorithms.EC_SECP256K1;
       case "1AAE" -> StandardSignatureAlgorithms.ED_448;
-      default -> throw new IllegalArgumentException("unknown code: " + code);
+      default -> throw new IllegalArgumentException(UNKNOWN_CODE + code);
     };
   }
 
@@ -183,9 +186,9 @@ public final class QualifiedBase64 {
       case 'B' -> StandardSignatureAlgorithms.EC_SECP256K1;
       case '0' -> switch (code.charAt(1)) {
         case 'A' -> StandardSignatureAlgorithms.EC_SECP256K1;
-        default -> throw new IllegalArgumentException("unknown code: " + code);
+        default -> throw new IllegalArgumentException(UNKNOWN_CODE + code);
       };
-      default -> throw new IllegalArgumentException("unknown code: " + code);
+      default -> throw new IllegalArgumentException(UNKNOWN_CODE + code);
     };
   }
 
@@ -209,7 +212,7 @@ public final class QualifiedBase64 {
       case "1AAB" -> StandardSignatureAlgorithms.EC_SECP256K1;
       case "D" -> StandardSignatureAlgorithms.ED_25519;
       case "1AAD" -> StandardSignatureAlgorithms.ED_448;
-      default -> throw new IllegalArgumentException("unknown code: " + code);
+      default -> throw new IllegalArgumentException(UNKNOWN_CODE + code);
     };
   }
 
@@ -219,16 +222,16 @@ public final class QualifiedBase64 {
       return switch (qb64.substring(1, 4)) {
         case "AAB" -> EC_SECP256K1.publicKey(bytes);
         case "AAD" -> ED_448.publicKey(bytes);
-        default -> throw new RuntimeException("Unrecognized public key: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_PUBLIC_KEY + qb64);
       };
-    } else if (!qb64.matches("^[0-6-]")) {
+    } else if (!qb64.matches(PREFIX_REGEX)) {
       var bytes = unbase64(qb64.substring(1));
       return switch (qb64.substring(0, 1)) {
         case "D" -> ED_25519.publicKey(bytes);
-        default -> throw new RuntimeException("Unrecognized public key: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_PUBLIC_KEY + qb64);
       };
     } else {
-      throw new RuntimeException("Unrecognized public key: " + qb64);
+      throw new IllegalArgumentException(UNRECOGNIZED_PUBLIC_KEY + qb64);
     }
   }
 
@@ -243,7 +246,7 @@ public final class QualifiedBase64 {
         case "E" -> new ImmutableSelfAddressingIdentifier(new ImmutableDigest(SHA3_512, bytes));
         case "F" -> new ImmutableSelfAddressingIdentifier(new ImmutableDigest(BLAKE2B_512, bytes));
         case "G" -> new ImmutableSelfAddressingIdentifier(new ImmutableDigest(SHA2_512, bytes));
-        default -> throw new RuntimeException("Unrecognized identifier: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_IDENTIFIER + qb64);
       };
     } else if (qb64.startsWith("1")) {
       var bytes = unbase64(qb64.substring(4));
@@ -253,9 +256,9 @@ public final class QualifiedBase64 {
         case "AAC" -> new ImmutableBasicIdentifier(ED_448.publicKey(bytes));
         // case "AAD" -> null; // Ed448 public key
         case "AAE" -> new ImmutableSelfSigningIdentifier(ED_25519.signature(bytes));
-        default -> throw new RuntimeException("Unrecognized identifier: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_IDENTIFIER + qb64);
       };
-    } else if (!qb64.matches("^[0-6-]")) {
+    } else if (!qb64.matches(PREFIX_REGEX)) {
       var bytes = unbase64(qb64.substring(1));
       return switch (qb64.substring(0, 1)) {
         // case "A" -> null; // Random seed of Ed25519 private key of length 256 bits
@@ -267,10 +270,10 @@ public final class QualifiedBase64 {
         case "G" -> new ImmutableSelfAddressingIdentifier(new ImmutableDigest(BLAKE2S_256, bytes));
         case "H" -> new ImmutableSelfAddressingIdentifier(new ImmutableDigest(SHA3_256, bytes));
         case "I" -> new ImmutableSelfAddressingIdentifier(new ImmutableDigest(SHA2_256, bytes));
-        default -> throw new RuntimeException("Unrecognized identifier: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_IDENTIFIER + qb64);
       };
     } else {
-      throw new RuntimeException("Unrecognized identifier: " + qb64);
+      throw new IllegalArgumentException(UNRECOGNIZED_IDENTIFIER + qb64);
     }
   }
 
@@ -279,7 +282,7 @@ public final class QualifiedBase64 {
       case "1AAA" -> StandardSignatureAlgorithms.EC_SECP256K1;
       case "1AAC" -> StandardSignatureAlgorithms.ED_25519;
       case "B" -> StandardSignatureAlgorithms.ED_448;
-      default -> throw new IllegalArgumentException("unknown code: " + code);
+      default -> throw new IllegalArgumentException(UNKNOWN_CODE + code);
     };
   }
 
@@ -291,9 +294,9 @@ public final class QualifiedBase64 {
         case "E" -> new ImmutableDigest(SHA3_512, bytes);
         case "F" -> new ImmutableDigest(BLAKE2B_512, bytes);
         case "G" -> new ImmutableDigest(SHA2_512, bytes);
-        default -> throw new RuntimeException("Unrecognized digest: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_DIGEST + qb64);
       };
-    } else if (!qb64.matches("^[0-6-]")) {
+    } else if (!qb64.matches(PREFIX_REGEX)) {
       var bytes = unbase64(qb64.substring(1));
       return switch (qb64.substring(0, 1)) {
         case "E" -> new ImmutableDigest(BLAKE3_256, bytes);
@@ -301,10 +304,10 @@ public final class QualifiedBase64 {
         case "G" -> new ImmutableDigest(BLAKE2S_256, bytes);
         case "H" -> new ImmutableDigest(SHA3_256, bytes);
         case "I" -> new ImmutableDigest(SHA2_256, bytes);
-        default -> throw new RuntimeException("Unrecognized digest: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_DIGEST + qb64);
       };
     } else {
-      throw new RuntimeException("Unrecognized digest: " + qb64);
+      throw new IllegalArgumentException(UNRECOGNIZED_DIGEST + qb64);
     }
   }
 
@@ -314,29 +317,29 @@ public final class QualifiedBase64 {
       return switch (qb64.substring(1, 2)) {
         case "B" -> ED_25519.signature(bytes);
         case "C" -> EC_SECP256K1.signature(bytes);
-        default -> throw new RuntimeException("Unrecognized signature: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_SIGNATURE + qb64);
       };
     } else if (qb64.startsWith("1")) {
       var bytes = unbase64(qb64.substring(4));
       return switch (qb64.substring(1, 4)) {
         case "AAE" -> ED_448.signature(bytes);
-        default -> throw new RuntimeException("Unrecognized signature: " + qb64);
+        default -> throw new IllegalArgumentException(UNRECOGNIZED_SIGNATURE + qb64);
       };
     } else {
-      throw new RuntimeException("Unrecognized signature: " + qb64);
+      throw new IllegalArgumentException(UNRECOGNIZED_SIGNATURE + qb64);
     }
   }
 
   public static String qb64(Identifier identifier) {
-    if (identifier instanceof BasicIdentifier) {
-      return qb64((BasicIdentifier) identifier);
-    } else if ((identifier instanceof SelfAddressingIdentifier)) {
-      return qb64((SelfAddressingIdentifier) identifier);
-    } else if (identifier instanceof SelfSigningIdentifier) {
-      return qb64((SelfSigningIdentifier) identifier);
+    if (identifier instanceof BasicIdentifier bid) {
+      return qb64(bid);
+    } else if ((identifier instanceof SelfAddressingIdentifier said)) {
+      return qb64(said);
+    } else if (identifier instanceof SelfSigningIdentifier ssid) {
+      return qb64(ssid);
     }
 
-    throw new RuntimeException("Unrecognized identifier: " + identifier.getClass());
+    throw new IllegalArgumentException(UNRECOGNIZED_IDENTIFIER + identifier.getClass());
   }
 
   public static String qb64(BasicIdentifier identifier) {

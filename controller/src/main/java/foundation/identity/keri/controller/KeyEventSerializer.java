@@ -7,12 +7,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.AttachmentEvent;
-import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyConfigurationDigest;
-import foundation.identity.keri.api.event.SigningThreshold;
+import foundation.identity.keri.api.event.*;
 import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
-import foundation.identity.keri.api.event.StandardFormats;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
@@ -28,7 +24,6 @@ import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static foundation.identity.keri.Hex.hexNoPad;
@@ -69,8 +64,8 @@ public final class KeyEventSerializer {
     }
   }
 
-  static String version(Version v, Format f, long size) {
-    return String.format("KERI%x%x%s%06x_", v.major(), v.minor(), format(f), size);
+  static String version(Version version, Format f, long size) {
+    return String.format("KERI%x%x%s%06x_", version.major(), version.minor(), format(f), size);
   }
 
   static String format(Format f) {
@@ -83,50 +78,45 @@ public final class KeyEventSerializer {
 
   static ObjectNode seal(Seal seal, ObjectMapper mapper) {
     var obj = mapper.createObjectNode();
-    if (seal instanceof KeyEventCoordinatesSeal) {
-      var els = (KeyEventCoordinatesSeal) seal;
-      obj.put("i", qb64(els.event().identifier()));
-      obj.put("s", hexNoPad(els.event().sequenceNumber()));
-      obj.put("d", qb64(els.event().digest()));
-    } else if ((seal instanceof DigestSeal)) {
-      obj.put("d", qb64(((DigestSeal) seal).digest()));
-    } else if (seal instanceof MerkleTreeRootSeal) {
-      obj.put("rd", qb64(((MerkleTreeRootSeal) seal).digest()));
+    if (seal instanceof KeyEventCoordinatesSeal kecs) {
+      obj.put("i", qb64(kecs.event().identifier()));
+      obj.put("s", hexNoPad(kecs.event().sequenceNumber()));
+      obj.put("d", qb64(kecs.event().digest()));
+    } else if ((seal instanceof DigestSeal ds)) {
+      obj.put("d", qb64(ds.digest()));
+    } else if (seal instanceof MerkleTreeRootSeal mtrs) {
+      obj.put("rd", qb64((mtrs).digest()));
     } else {
       throw new IllegalArgumentException("Unknown seal type: " + seal.getClass());
     }
     return obj;
   }
 
-  static JsonNode signingThreshold(SigningThreshold t, ObjectMapper mapper) {
-    if (t instanceof SigningThreshold.Unweighted) {
-      return mapper.getNodeFactory().textNode(((SigningThreshold.Unweighted) t).threshold() + "");
-    } else if (t instanceof SigningThreshold.Weighted) {
-      var wt = (SigningThreshold.Weighted) t;
-      var groupArrayNodes = Stream.of(wt.weights())
+  static JsonNode signingThreshold(SigningThreshold threshold, ObjectMapper mapper) {
+    if (threshold instanceof SigningThreshold.Unweighted unweighted) {
+      return mapper.getNodeFactory().textNode(Integer.toString(unweighted.threshold()));
+    } else if (threshold instanceof SigningThreshold.Weighted weighted) {
+      var groupArrayNodes = Stream.of(weighted.weights())
           .map(lw -> {
-                var textNodes = Stream.of(lw)
-                    .map(KeyEventSerializer::weight)
-                    .map(str -> mapper.getNodeFactory().textNode(str))
-                    .collect(Collectors.toList());
-                return mapper.getNodeFactory().arrayNode()
-                    .addAll(textNodes);
+            var textNodes = Stream.of(lw)
+                .map(KeyEventSerializer::weight)
+                .map(str -> mapper.getNodeFactory().textNode(str))
+                .toList();
+            return mapper.getNodeFactory().arrayNode()
+                .addAll(textNodes);
           })
-          .collect(Collectors.toList());
-
+          .toList();
       return mapper.getNodeFactory().arrayNode()
           .addAll(groupArrayNodes);
     } else {
-      throw new IllegalArgumentException("Unknown SigningThreshold type: " + t.getClass());
+      throw new IllegalArgumentException("Unknown SigningThreshold type: " + threshold.getClass());
     }
   }
 
   static String weight(Weight w) {
-    if (w.denominator().isEmpty()) {
-      return "" + w.numerator();
-    }
-
-    return w.numerator() + "/" + w.denominator().get();
+    return w.denominator()
+        .map(denominator -> "%d/%d".formatted(w.numerator(), denominator))
+        .orElseGet(() -> Integer.toString(w.numerator()));
   }
 
   static void writeSize(byte[] bytes) {

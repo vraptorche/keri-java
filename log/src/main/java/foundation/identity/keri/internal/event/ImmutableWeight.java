@@ -18,10 +18,9 @@ public class ImmutableWeight implements Weight {
   }
 
   public static ImmutableWeight of(Weight weight) {
-    if (weight instanceof ImmutableWeight) {
-      return (ImmutableWeight) weight;
+    if (weight instanceof ImmutableWeight immutableWeight) {
+      return immutableWeight;
     }
-
     requireNonNull(weight, "weight");
     return new ImmutableWeight(weight.numerator(), weight.denominator().orElse(null));
   }

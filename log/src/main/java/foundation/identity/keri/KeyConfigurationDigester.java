@@ -15,9 +15,11 @@ import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 
 public class KeyConfigurationDigester {
+  private KeyConfigurationDigester() {
+
+  }
 
   public static boolean matches(SigningThreshold signingThreshold, List<PublicKey> nextKeys, KeyConfigurationDigest in) {
     return digest(signingThreshold, nextKeys, in.algorithm()).equals(in);
@@ -30,7 +32,7 @@ public class KeyConfigurationDigester {
         .map(QualifiedBase64::qb64)
         .map(qb64 -> qb64.getBytes(UTF_8))
         .map(digOps::digest)
-        .collect(toList());
+        .toList();
 
     return digest(signingThreshold, keyDigs);
   }
@@ -52,10 +54,10 @@ public class KeyConfigurationDigester {
   }
 
   static byte[] signingThresholdRepresentation(SigningThreshold threshold) {
-    if (threshold instanceof SigningThreshold.Unweighted) {
-      return Hex.hexNoPad(((SigningThreshold.Unweighted) threshold).threshold()).getBytes(UTF_8);
-    } else if (threshold instanceof SigningThreshold.Weighted) {
-      return Stream.of(((SigningThreshold.Weighted) threshold).weights())
+    if (threshold instanceof SigningThreshold.Unweighted unweighted) {
+      return Hex.hexNoPad(unweighted.threshold()).getBytes(UTF_8);
+    } else if (threshold instanceof SigningThreshold.Weighted weighted) {
+      return Stream.of((weighted).weights())
           .map(lw -> Stream.of(lw)
               .map(KeyConfigurationDigester::weight)
               .collect(joining(",")))
@@ -67,11 +69,8 @@ public class KeyConfigurationDigester {
   }
 
   static String weight(Weight w) {
-    if (w.denominator().isEmpty()) {
-      return "" + w.numerator();
-    }
-
-    return w.numerator() + "/" + w.denominator().get();
+    return w.denominator()
+        .map(d -> "%d/%d".formatted(w.numerator(), d))
+        .orElseGet(() -> String.valueOf(w.numerator()));
   }
-
 }

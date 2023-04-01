@@ -37,12 +37,9 @@ public class ImmutableWeightedSigningThreshold implements Weighted {
     if (this == o) {
       return true;
     }
-
-    if (!(o instanceof Weighted)) {
+    if (!(o instanceof Weighted that)) {
       return false;
     }
-
-    var that = (Weighted) o;
     return Arrays.deepEquals(this.weights, that.weights());
   }
 

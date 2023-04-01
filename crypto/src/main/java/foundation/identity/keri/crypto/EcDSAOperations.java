@@ -63,7 +63,7 @@ public class EcDSAOperations implements SignatureOperations {
 			return publicKeyParameter.getQ().getEncoded(true);
 		} catch (GeneralSecurityException e) {
 			// TODO handle better
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -77,7 +77,7 @@ public class EcDSAOperations implements SignatureOperations {
 			return this.keyFactory.generatePublic(spec);
 		} catch (GeneralSecurityException e) {
 			// TODO handle better
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class EcDSAOperations implements SignatureOperations {
 
 			return this.keyFactory.generatePrivate(spec);
 		} catch (InvalidKeySpecException e) {
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class EcDSAOperations implements SignatureOperations {
 			return new ImmutableSignature(this.signatureAlgorithm, bytes);
 		} catch (GeneralSecurityException e) {
 			// TODO handle better
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -123,7 +123,7 @@ public class EcDSAOperations implements SignatureOperations {
 			return sig.verify(signature.bytes());
 		} catch (GeneralSecurityException e) {
 			// TODO handle better
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 

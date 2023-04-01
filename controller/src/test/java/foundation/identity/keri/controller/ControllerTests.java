@@ -12,9 +12,8 @@ import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
 import foundation.identity.keri.internal.seal.ImmutableKeyEventCoordinatesSeal;
 import foundation.identity.keri.internal.seal.ImmutableMerkleTreeRootSeal;
 import foundation.identity.keri.keystorage.inmemory.InMemoryIdentifierKeyStore;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -23,6 +22,7 @@ import java.util.List;
 import static foundation.identity.keri.SigningThresholds.unweighted;
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayNameGeneration(ReplaceUnderscores.class)
 public class ControllerTests {
 
   SecureRandom secureRandom = new SecureRandom(new byte[]{0});
@@ -43,7 +43,7 @@ public class ControllerTests {
   }
 
   @Test
-   void test_newPrivateIdentifier() {
+  void test_newPrivateIdentifier() {
     var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
 
     var i = controller.newPrivateIdentifier();
@@ -56,7 +56,7 @@ public class ControllerTests {
         Hex.unhex("c72586fae3ac9f3542dc6349f892072a4cfa4d63bb6e23d32935e239e2ace741"),
         sap.digest().bytes());
 
-    assertEquals(1, ((Unweighted)i.signingThreshold()).threshold());
+    assertEquals(1, ((Unweighted) i.signingThreshold()).threshold());
 
     // keys
     assertEquals(1, i.keys().size());
@@ -104,7 +104,7 @@ public class ControllerTests {
   }
 
   @Test
-   void test_privateIdentifier_rotate() {
+  void test_privateIdentifier_rotate() {
     var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
 
     var i = controller.newPrivateIdentifier();
@@ -123,7 +123,7 @@ public class ControllerTests {
   }
 
   @Test
-   void test_privateIdentifier_interaction() {
+  void test_privateIdentifier_interaction() {
     var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
 
     var i = controller.newPrivateIdentifier();

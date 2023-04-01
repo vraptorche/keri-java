@@ -40,10 +40,10 @@ public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmen
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
     super(
-        version,
-        format,
-        identifier,
-        0L,
+        new KeyEventDetails(version,
+            format,
+            identifier,
+            0L),
         KeyEventCoordinates.NONE,
         signingThreshold,
         keys,
@@ -52,7 +52,8 @@ public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmen
         bytes,
         signatures,
         receipts,
-        otherReceipts);
+        otherReceipts
+    );
     this.inceptionStatement = requireNonNull(inceptionStatement, "inceptionStatement").clone();
     this.witnesses = List.copyOf(requireNonNull(witnesses, "witnesses"));
     this.configurationTraits = Set.copyOf(requireNonNull(configurationTraits, "configurationTraits"));

@@ -25,9 +25,9 @@ public final class DirectMode {
 
   private Channel listeningChannel;
 
-  private final static EventLoopGroup acceptorGroup = new NioEventLoopGroup();
-  private final static EventLoopGroup connectionsGroup = new NioEventLoopGroup();
-  private final static EventLoopGroup eventProcessingGroup = new DefaultEventLoopGroup();
+  private static final EventLoopGroup acceptorGroup = new NioEventLoopGroup();
+  private static final EventLoopGroup connectionsGroup = new NioEventLoopGroup();
+  private static final EventLoopGroup eventProcessingGroup = new DefaultEventLoopGroup();
 
   private final KeyEventStore keyEventStore;
   private final ControllableIdentifier controller;

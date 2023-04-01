@@ -3,9 +3,7 @@ package foundation.identity.keri.controller.spec;
 import foundation.identity.keri.SigningThresholds;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.crypto.SignatureOperations;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 
 import java.security.KeyPair;
@@ -15,7 +13,9 @@ import java.security.SecureRandom;
 import static foundation.identity.keri.SigningThresholds.weight;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DisplayNameGenerator.*;
 
+@DisplayNameGeneration(ReplaceUnderscores.class)
  class IdentifierSpecTests {
 
   SecureRandom deterministicRandom;

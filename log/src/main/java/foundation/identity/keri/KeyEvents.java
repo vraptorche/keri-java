@@ -20,6 +20,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
 public final class KeyEvents {
+  private KeyEvents() {
+
+  }
 
   public static String toString(KeyEvent e) {
     var sb = new StringBuilder();
@@ -28,39 +31,33 @@ public final class KeyEvents {
     sb.append("s:  ").append(e.sequenceNumber()).append("\n");
     sb.append("p:  ").append(e.previous().digest()).append("\n");
 
-    if (e instanceof EstablishmentEvent) {
-      var ee = (EstablishmentEvent) e;
+    if (e instanceof EstablishmentEvent ee) {
       sb.append("kt: ").append(ee.signingThreshold()).append("\n");
       sb.append("k:  ").append(listToString(ee.keys(), QualifiedBase64::qb64)).append("\n");
       sb.append("wt: ").append(ee.witnessThreshold()).append("\n");
 
-      if (ee instanceof InceptionEvent) {
-        var ic = (InceptionEvent) ee;
+      if (ee instanceof InceptionEvent ic) {
         sb.append("w: ").append(listToString(ic.witnesses(), QualifiedBase64::qb64)).append("\n");
         sb.append("c: ").append(ic.configurationTraits()).append("\n");
       }
 
-      if (ee instanceof RotationEvent) {
-        var re = (RotationEvent) ee;
+      if (ee instanceof RotationEvent re) {
         sb.append("wr: ").append(listToString(re.removedWitnesses(), QualifiedBase64::qb64)).append("\n");
         sb.append("wa: ").append(listToString(re.addedWitnesses(), QualifiedBase64::qb64)).append("\n");
         sb.append("a:  ").append(listToString(re.seals(), Object::toString)).append("\n");
       }
 
-      if (ee instanceof DelegatedEstablishmentEvent) {
-        var dee = (DelegatedEstablishmentEvent) ee;
+      if (ee instanceof DelegatedEstablishmentEvent dee) {
         sb.append("da:  ").append(dee.delegatingEvent()).append("\n");
       }
 
     }
 
-    if (e instanceof InteractionEvent) {
-      var ix = (InteractionEvent) e;
+    if (e instanceof InteractionEvent ix) {
       sb.append("a:  ").append(listToString(ix.seals(), Object::toString)).append("\n");
     }
 
-    if (e instanceof AttachmentEvent) {
-      var add = (AttachmentEvent) e;
+    if (e instanceof AttachmentEvent add) {
       sb.append("d: ").append(add.coordinates().digest()).append("\n");
     }
 

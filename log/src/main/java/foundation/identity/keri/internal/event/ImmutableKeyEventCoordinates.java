@@ -39,10 +39,9 @@ public class ImmutableKeyEventCoordinates implements KeyEventCoordinates {
 
   public static ImmutableKeyEventCoordinates convert(KeyEventCoordinates coordinates) {
     requireNonNull(coordinates, "coordinates");
-    if (coordinates instanceof ImmutableKeyEventCoordinates) {
-      return (ImmutableKeyEventCoordinates) coordinates;
+    if (coordinates instanceof ImmutableKeyEventCoordinates ikec) {
+      return ikec;
     }
-
     return new ImmutableKeyEventCoordinates(
         coordinates.identifier(),
         coordinates.sequenceNumber(),
