@@ -22,10 +22,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
   private final DelegatingEventCoordinates delegatingEvent;
 
   public AbstractImmutableDelegatedEstablishmentEvent(
-      Version version,
-      Format format,
-      Identifier identifier,
-      long sequenceNumber,
+      KeyEventDetails keyEventDetails,
       KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,
@@ -37,10 +34,7 @@ public abstract class AbstractImmutableDelegatedEstablishmentEvent extends Abstr
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
     super(
-        version,
-        format,
-        identifier,
-        sequenceNumber,
+        keyEventDetails,
         previous,
         signingThreshold,
         keys,

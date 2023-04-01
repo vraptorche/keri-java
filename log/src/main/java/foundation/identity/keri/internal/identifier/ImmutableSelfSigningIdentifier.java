@@ -6,23 +6,7 @@ import foundation.identity.keri.crypto.Signature;
 
 import java.util.Objects;
 
-public class ImmutableSelfSigningIdentifier implements SelfSigningIdentifier {
-
-  final Signature signature;
-
-  public ImmutableSelfSigningIdentifier(Signature signature) {
-    this.signature = signature;
-  }
-
-  @Override
-  public Signature signature() {
-    return this.signature;
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.signature);
-  }
+public record ImmutableSelfSigningIdentifier(Signature signature) implements SelfSigningIdentifier {
 
   @Override
   public boolean equals(Object obj) {

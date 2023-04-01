@@ -28,10 +28,7 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
   private final List<Seal> seals;
 
   public ImmutableDelegatedRotationEvent(
-      Version version,
-      Format format,
-      Identifier identifier,
-      long sequenceNumber,
+      KeyEventDetails keyEventDetails,
       KeyEventCoordinates previous,
       SigningThreshold signingThreshold,
       List<PublicKey> keys,
@@ -46,10 +43,7 @@ public final class ImmutableDelegatedRotationEvent extends AbstractImmutableDele
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
     super(
-        version,
-        format,
-        identifier,
-        sequenceNumber,
+        keyEventDetails,
         previous,
         signingThreshold,
         keys,

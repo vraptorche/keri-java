@@ -25,8 +25,7 @@ public interface SelfSigningIdentifier extends Identifier {
     if (!(o instanceof SelfSigningIdentifier)) {
       return false;
     }
-
-    return Signature.equals(prefix.signature(), ((SelfSigningIdentifier) o).signature());
+    return prefix.signature().equals(((SelfSigningIdentifier) o).signature());
   }
 
   static int hashCode(SelfSigningIdentifier prefix) {

@@ -33,7 +33,6 @@ public class KeyEventDecoder extends ReplayingDecoder<Void> {
     var messageBytes = readMessage(in);
     var signatures = readSignatures(in);
     // var receipts = readReceipts(in); // Pending keri#91
-
     var event = this.deserializer.deserialize(messageBytes, signatures);
     out.add(event);
   }

@@ -1,19 +1,21 @@
 package foundation.identity.keri.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
 import org.junit.jupiter.api.Test;
-
 
 import static foundation.identity.keri.SigningThresholds.*;
 import static foundation.identity.keri.controller.KeyEventSerializer.signingThreshold;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
- class KeyEventSerializerTests {
+@DisplayNameGeneration(ReplaceUnderscores.class)
+class KeyEventSerializerTests {
 
   final ObjectMapper mapper = new ObjectMapper();
 
   @Test
-   void signingThreshold__unweighted() {
+  void signingThreshold__unweighted() {
     assertEquals("\"1\"", signingThreshold(unweighted(1), this.mapper).toString());
 
     assertEquals(
@@ -26,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
   }
 
   @Test
-   void signingThreshold__weighted() {
+  void signingThreshold__weighted() {
 
     // ["1/2", "1/2", "1/4", "1/4", "1/4"]
     assertEquals(

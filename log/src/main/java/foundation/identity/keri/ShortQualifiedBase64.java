@@ -16,8 +16,11 @@ import static foundation.identity.keri.QualifiedBase64.qb64;
  * but not much else since the code cannot be resolved to it's full length.
  */
 public class ShortQualifiedBase64 {
+  private ShortQualifiedBase64() {
 
-  public final static int SHORTENED_LENGTH = 12;
+  }
+
+  public static final int SHORTENED_LENGTH = 12;
 
   public static String shortQb64(PublicKey publicKey) {
     return qb64(publicKey).substring(0, SHORTENED_LENGTH);

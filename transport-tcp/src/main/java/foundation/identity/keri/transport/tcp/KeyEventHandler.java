@@ -39,10 +39,10 @@ class KeyEventHandler extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    if (msg instanceof KeyEvent) {
-      this.readKeyEvent(ctx, (KeyEvent) msg);
-    } else if (msg instanceof AttachmentEvent) {
-      this.readAttachmentEvent(ctx, (AttachmentEvent) msg);
+    if (msg instanceof KeyEvent keyEvent) {
+      this.readKeyEvent(ctx, keyEvent);
+    } else if (msg instanceof AttachmentEvent attachmentEvent) {
+      this.readAttachmentEvent(ctx, attachmentEvent);
     }
   }
 
@@ -52,7 +52,9 @@ class KeyEventHandler extends ChannelInboundHandlerAdapter {
 
     for (var e : this.acceptedEvents) {
       this.sendOwnLogIfNecessary(ctx, e);
-      LOGGER.debug("SENDING RECEIPT FOR: {}", shortQb64(e.coordinates()));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("SENDING RECEIPT FOR: {}", shortQb64(e.coordinates()));
+      }
       ctx.writeAndFlush(this.buildReceipt(e))
           .addListener(f -> ctx.read());
     }
@@ -62,7 +64,9 @@ class KeyEventHandler extends ChannelInboundHandlerAdapter {
 
   private void readKeyEvent(ChannelHandlerContext ctx, KeyEvent keyEvent) {
     try {
-      LOGGER.debug("PROCESS: {}", shortQb64(keyEvent.coordinates()));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("PROCESS: {}", shortQb64(keyEvent.coordinates()));
+      }
       this.processor.process(keyEvent);
 
       LOGGER.debug("ACCEPTED");
@@ -84,7 +88,9 @@ class KeyEventHandler extends ChannelInboundHandlerAdapter {
 
   private void readAttachmentEvent(ChannelHandlerContext ctx, AttachmentEvent attachmentEvent) {
     try {
-      LOGGER.debug("PROCESS ATTACHMENT: {}", shortQb64(attachmentEvent.coordinates()));
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("PROCESS ATTACHMENT: {}", shortQb64(attachmentEvent.coordinates()));
+      }
       this.processor.process(attachmentEvent);
       ctx.read();
     } catch (AttachmentEventProcessingException e) {

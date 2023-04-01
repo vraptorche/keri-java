@@ -16,6 +16,10 @@ import java.security.PublicKey;
 
 public class IdentifierFactory {
 
+  private IdentifierFactory() {
+
+  }
+
   public static Identifier identifier(IdentifierSpec spec, byte[] inceptionStatement) {
     var derivation = spec.derivation();
     if (derivation.isAssignableFrom(BasicIdentifier.class)) {

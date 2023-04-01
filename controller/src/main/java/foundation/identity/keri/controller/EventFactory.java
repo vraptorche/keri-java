@@ -7,12 +7,14 @@ import foundation.identity.keri.api.event.RotationEvent;
 import foundation.identity.keri.controller.spec.IdentifierSpec;
 import foundation.identity.keri.controller.spec.InteractionSpec;
 import foundation.identity.keri.controller.spec.RotationSpec;
+import foundation.identity.keri.controller.spec.Signer;
 import foundation.identity.keri.crypto.Signature;
 import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author stephen
@@ -46,13 +48,7 @@ public final class EventFactory {
 
   public RotationEvent rotation(RotationSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
-    Map<Integer, Signature> signatures = Map.of();
-
-    if (spec.signer() != null) {
-      var signature = spec.signer().sign(bytes);
-      signatures = Map.of(0, signature);
-    }
-
+    Map<Integer, Signature> signatures = doSign(spec.signer(), bytes);
     return new ImmutableRotationEvent(
         Version.CURRENT,
         spec.format(),
@@ -74,13 +70,7 @@ public final class EventFactory {
 
   public InteractionEvent interaction(InteractionSpec spec) {
     var bytes = this.eventSerializer.serialize(spec);
-    Map<Integer, Signature> signatures = Map.of();
-
-    if (spec.signer() != null) {
-      var signature = spec.signer().sign(bytes);
-      signatures = Map.of(0, signature);
-    }
-
+    Map<Integer, Signature> signatures = doSign(spec.signer(), bytes);
     return new ImmutableInteractionEvent(
         Version.CURRENT,
         spec.format(),
@@ -92,6 +82,13 @@ public final class EventFactory {
         signatures,
         Map.of(),
         Map.of());
+  }
+
+  private Map<Integer, Signature> doSign(Signer signer, byte[] bytes) {
+    return Optional.ofNullable(signer)
+        .map(s -> s.sign(bytes))
+        .map(signature -> Map.of(0, signature))
+        .orElseGet(Map::of);
   }
 
 }

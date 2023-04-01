@@ -4,18 +4,7 @@ import foundation.identity.keri.api.identifier.BasicIdentifier;
 
 import java.security.PublicKey;
 
-public class ImmutableBasicIdentifier implements BasicIdentifier {
-
-  final PublicKey publicKey;
-
-  public ImmutableBasicIdentifier(PublicKey publicKey) {
-    this.publicKey = publicKey;
-  }
-
-  @Override
-  public PublicKey publicKey() {
-    return this.publicKey;
-  }
+public record ImmutableBasicIdentifier(PublicKey publicKey) implements BasicIdentifier {
 
   @Override
   public int hashCode() {

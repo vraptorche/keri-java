@@ -22,8 +22,8 @@ public enum StandardDigestAlgorithms implements DigestAlgorithm {
   }
 
   public static StandardDigestAlgorithms valueOf(DigestAlgorithm algorithm) {
-    if (algorithm instanceof StandardDigestAlgorithms) {
-      return (StandardDigestAlgorithms) algorithm;
+    if (algorithm instanceof StandardDigestAlgorithms digestAlgorithms) {
+      return digestAlgorithms;
     }
 
     for (var v : values()) {
@@ -31,7 +31,6 @@ public enum StandardDigestAlgorithms implements DigestAlgorithm {
         return v;
       }
     }
-
     throw new IllegalArgumentException("No algorithm with name " + algorithm.algorithmName());
   }
 

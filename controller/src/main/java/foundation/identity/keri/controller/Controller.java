@@ -93,6 +93,7 @@ public final class Controller {
         .key(initialKeyPair.getPublic())
         .nextKeys(nextKeys)
         .witnesses(Arrays.asList(witnesses))
+        .signer(0,initialKeyPair.getPrivate())
         .build();
 
     var event = this.eventFactory.inception(spec);

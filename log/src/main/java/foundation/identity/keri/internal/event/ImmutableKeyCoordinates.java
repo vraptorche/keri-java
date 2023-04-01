@@ -24,10 +24,9 @@ public class ImmutableKeyCoordinates implements KeyCoordinates {
   }
 
   public static ImmutableKeyCoordinates convert(KeyCoordinates coordinates) {
-    if (coordinates instanceof ImmutableKeyCoordinates) {
-      return (ImmutableKeyCoordinates) coordinates;
+    if (coordinates instanceof ImmutableKeyCoordinates ikc) {
+      return ikc;
     }
-
     return new ImmutableKeyCoordinates(
         coordinates.establishmentEvent(),
         coordinates.keyIndex()

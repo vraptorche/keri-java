@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ControllableIdentifier extends KeyState {
 
+
   void rotate();
 
   void rotate(List<Seal> seals);

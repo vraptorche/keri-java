@@ -35,14 +35,13 @@ public class EdDSAOperations implements SignatureOperations {
       this.parameterSpec = switch (curveName) {
         case "ed25519" -> NamedParameterSpec.ED25519;
         case "ed448" -> NamedParameterSpec.ED448;
-        default -> throw new RuntimeException("Unknown Edwards curve: " + curveName);
+        default -> throw new IllegalArgumentException("Unknown Edwards curve: " + curveName);
       };
-
       this.keyPairGenerator = KeyPairGenerator.getInstance(EDDSA_ALGORITHM_NAME);
       this.keyPairGenerator.initialize(this.parameterSpec);
       this.keyFactory = KeyFactory.getInstance(EDDSA_ALGORITHM_NAME);
     } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 
@@ -85,7 +84,7 @@ public class EdDSAOperations implements SignatureOperations {
       kpg.initialize(this.parameterSpec, secureRandom);
       return kpg.generateKeyPair();
     } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 
@@ -103,13 +102,14 @@ public class EdDSAOperations implements SignatureOperations {
   }
 
   private int keyLength() {
-    if (this.parameterSpec.getName().equals("Ed25519")) {
+    final String curveName = this.parameterSpec.getName();
+    if (curveName.equals("Ed25519")) {
       return StandardSignatureAlgorithms.ED_25519.publicKeyLength();
-    } else if (this.parameterSpec.getName().equals("Ed448")) {
+    } else if (curveName.equals("Ed448")) {
       return StandardSignatureAlgorithms.ED_448.publicKeyLength();
     } else {
       // TODO handle better
-      throw new RuntimeException("Unknown Edwards curve: " + this.parameterSpec.getName());
+      throw new IllegalArgumentException("Unknown Edwards curve: " + curveName);
     }
   }
 
@@ -117,7 +117,7 @@ public class EdDSAOperations implements SignatureOperations {
   public PublicKey publicKey(byte[] bytes) {
     try {
       if (bytes.length != this.keyLength()) {
-        throw new RuntimeException(new InvalidKeyException("key length is " + bytes.length +
+        throw new IllegalArgumentException(new InvalidKeyException("key length is " + bytes.length +
             ", key length must be " + this.keyLength()));
       }
 
@@ -126,18 +126,17 @@ public class EdDSAOperations implements SignatureOperations {
       return this.keyFactory.generatePublic(new EdECPublicKeySpec(this.parameterSpec, point));
     } catch (GeneralSecurityException e) {
       // TODO handle better
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 
   @Override
   public PrivateKey privateKey(byte[] bytes) {
     try {
-
       return this.keyFactory.generatePrivate(new EdECPrivateKeySpec(this.parameterSpec, bytes));
     } catch (GeneralSecurityException e) {
       // TODO handle better
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 
@@ -157,7 +156,7 @@ public class EdDSAOperations implements SignatureOperations {
       return new ImmutableSignature(this.signatureAlgorithm, bytes);
     } catch (GeneralSecurityException e) {
       // TODO handle better
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 
@@ -170,7 +169,7 @@ public class EdDSAOperations implements SignatureOperations {
       return sig.verify(signature.bytes());
     } catch (GeneralSecurityException e) {
       // TODO handle better
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
   }
 

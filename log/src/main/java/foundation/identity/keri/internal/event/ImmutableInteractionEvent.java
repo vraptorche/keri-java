@@ -28,10 +28,11 @@ public final class ImmutableInteractionEvent extends AbstractImmutableKeyEvent i
       Map<Integer, Signature> signatures,
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
-    super(version,
-        format,
-        identifier,
-        sequenceNumber,
+    super(
+        new KeyEventDetails(version,
+            format,
+            identifier,
+            sequenceNumber),
         previous,
         bytes,
         signatures,

@@ -13,11 +13,10 @@ public interface EdDSAParameters extends SignatureAlgorithmParameters {
       return false;
     }
 
-    if (!(o instanceof EdDSAParameters)) {
+    if (!(o instanceof EdDSAParameters otherAlgorithm)) {
       return false;
     }
 
-    var otherAlgorithm = (EdDSAParameters) o;
     return parameters.curveName().equals(otherAlgorithm.curveName());
   }
 

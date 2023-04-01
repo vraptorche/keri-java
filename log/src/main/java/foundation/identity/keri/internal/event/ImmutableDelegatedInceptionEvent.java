@@ -1,19 +1,12 @@
 package foundation.identity.keri.internal.event;
 
 import foundation.identity.keri.api.Version;
-import foundation.identity.keri.api.event.ConfigurationTrait;
-import foundation.identity.keri.api.event.DelegatedInceptionEvent;
-import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyConfigurationDigest;
-import foundation.identity.keri.api.event.KeyEventCoordinates;
-import foundation.identity.keri.api.event.SigningThreshold;
+import foundation.identity.keri.api.event.*;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.crypto.Signature;
 
 import java.security.PublicKey;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,16 +31,17 @@ public class ImmutableDelegatedInceptionEvent extends AbstractImmutableDelegated
       KeyConfigurationDigest nextKeys,
       int witnessThreshold,
       List<BasicIdentifier> witnesses,
-      EnumSet<ConfigurationTrait> configurationTraits,
+      Set<ConfigurationTrait> configurationTraits,
       DelegatingEventCoordinates delegatingEvent,
       Map<Integer, Signature> signatures,
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
     super(
-        version,
-        format,
-        identifier,
-        0L,
+        new KeyEventDetails(
+            version,
+            format,
+            identifier,
+            0L),
         KeyEventCoordinates.NONE,
         signingThreshold,
         keys,

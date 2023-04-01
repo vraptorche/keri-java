@@ -41,11 +41,10 @@ public final class ImmutableRotationEvent extends AbstractImmutableEstablishment
       Map<Integer, Signature> receipts,
       Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
     super(
-        version,
-        format,
-        identifier,
-        sequenceNumber,
-        previous,
+        new KeyEventDetails(version,
+            format,
+            identifier,
+            sequenceNumber), previous,
         signingThreshold,
         keys,
         nextKeys,
