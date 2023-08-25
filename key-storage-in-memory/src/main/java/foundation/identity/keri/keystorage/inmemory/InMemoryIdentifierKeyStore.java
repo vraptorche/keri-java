@@ -3,7 +3,7 @@ package foundation.identity.keri.keystorage.inmemory;
 import foundation.identity.keri.IdentifierKeyStore;
 import foundation.identity.keri.QualifiedBase64;
 import foundation.identity.keri.api.event.KeyCoordinates;
-import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
+import foundation.identity.keri.internal.event.KeyCoordinatesRecord;
 
 import java.security.KeyPair;
 import java.util.HashMap;
@@ -19,43 +19,43 @@ import static java.util.Map.Entry.comparingByKey;
  */
 public class InMemoryIdentifierKeyStore implements IdentifierKeyStore {
 
-  private final Map<ImmutableKeyCoordinates, KeyPair> keys = new HashMap<>();
-  private final Map<ImmutableKeyCoordinates, KeyPair> nextKeys = new HashMap<>();
+  private final Map<KeyCoordinatesRecord, KeyPair> keys = new HashMap<>();
+  private final Map<KeyCoordinatesRecord, KeyPair> nextKeys = new HashMap<>();
 
   @Override
   public void storeKey(KeyCoordinates coordinates, KeyPair keyPair) {
-    this.keys.put(ImmutableKeyCoordinates.convert(coordinates), keyPair);
+    this.keys.put(KeyCoordinatesRecord.convert(coordinates), keyPair);
   }
 
   @Override
   public Optional<KeyPair> getKey(KeyCoordinates keyCoordinates) {
-    keyCoordinates = ImmutableKeyCoordinates.convert(keyCoordinates);
+    keyCoordinates = KeyCoordinatesRecord.convert(keyCoordinates);
     // TODO digest algorithm agility--need to re-hash if not found
     return Optional.ofNullable(this.keys.get(keyCoordinates));
   }
 
   @Override
   public Optional<KeyPair> removeKey(KeyCoordinates keyCoordinates) {
-    keyCoordinates = ImmutableKeyCoordinates.convert(keyCoordinates);
+    keyCoordinates = KeyCoordinatesRecord.convert(keyCoordinates);
     // TODO digest algorithm agility--need to re-hash if not found
     return Optional.ofNullable(this.keys.remove(keyCoordinates));
   }
 
   @Override
   public void storeNextKey(KeyCoordinates coordinates, KeyPair keyPair) {
-    this.nextKeys.put(ImmutableKeyCoordinates.convert(coordinates), keyPair);
+    this.nextKeys.put(KeyCoordinatesRecord.convert(coordinates), keyPair);
   }
 
   @Override
   public Optional<KeyPair> getNextKey(KeyCoordinates keyCoordinates) {
-    keyCoordinates = ImmutableKeyCoordinates.convert(keyCoordinates);
+    keyCoordinates = KeyCoordinatesRecord.convert(keyCoordinates);
     // TODO digest algorithm agility--need to re-hash if not found
     return Optional.ofNullable(this.nextKeys.get(keyCoordinates));
   }
 
   @Override
   public Optional<KeyPair> removeNextKey(KeyCoordinates keyCoordinates) {
-    keyCoordinates = ImmutableKeyCoordinates.convert(keyCoordinates);
+    keyCoordinates = KeyCoordinatesRecord.convert(keyCoordinates);
     // TODO digest algorithm agility--need to re-hash if not found
     return Optional.ofNullable(this.nextKeys.remove(keyCoordinates));
   }

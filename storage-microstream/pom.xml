@@ -11,7 +11,7 @@
   <packaging>pom</packaging>
 
   <properties>
-    <microstream.version>08.00.00-MS-EA2</microstream.version>
+    <microstream.version>08.01.01-MS-GA</microstream.version>
   </properties>
 
   <modules>

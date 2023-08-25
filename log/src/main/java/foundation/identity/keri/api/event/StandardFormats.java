@@ -11,7 +11,6 @@ public enum StandardFormats implements Format {
         return v;
       }
     }
-
     throw new IllegalArgumentException("Unknown format: " + formatName);
   }
 

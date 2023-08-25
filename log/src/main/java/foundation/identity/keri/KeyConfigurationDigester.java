@@ -17,60 +17,61 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.joining;
 
 public class KeyConfigurationDigester {
-  private KeyConfigurationDigester() {
+    private KeyConfigurationDigester() {
 
-  }
-
-  public static boolean matches(SigningThreshold signingThreshold, List<PublicKey> nextKeys, KeyConfigurationDigest in) {
-    return digest(signingThreshold, nextKeys, in.algorithm()).equals(in);
-  }
-
-  public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<PublicKey> nextKeys, DigestAlgorithm algo) {
-    var digOps = DigestOperations.lookup(algo);
-
-    var keyDigs = nextKeys.stream()
-        .map(QualifiedBase64::qb64)
-        .map(qb64 -> qb64.getBytes(UTF_8))
-        .map(digOps::digest)
-        .toList();
-
-    return digest(signingThreshold, keyDigs);
-  }
-
-  public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<Digest> nextKeyDigests) {
-    var st = signingThresholdRepresentation(signingThreshold);
-    var digestAlgorithm = nextKeyDigests.get(0).algorithm();
-    var digOps = DigestOperations.lookup(digestAlgorithm);
-
-    var digest = digOps.digest(st).bytes();// digest
-    for (var d : nextKeyDigests) {
-      var keyDigest = d.bytes();
-      for (var i = keyDigest.length - 1; i >= 0; i--) {
-        digest[i] = (byte) (digest[i] ^ keyDigest[i]);
-      }
     }
 
-    return new ImmutableKeyConfigurationDigest(new ImmutableDigest(nextKeyDigests.get(0).algorithm(), digest));
-  }
-
-  static byte[] signingThresholdRepresentation(SigningThreshold threshold) {
-    if (threshold instanceof SigningThreshold.Unweighted unweighted) {
-      return Hex.hexNoPad(unweighted.threshold()).getBytes(UTF_8);
-    } else if (threshold instanceof SigningThreshold.Weighted weighted) {
-      return Stream.of((weighted).weights())
-          .map(lw -> Stream.of(lw)
-              .map(KeyConfigurationDigester::weight)
-              .collect(joining(",")))
-          .collect(joining(("&")))
-          .getBytes(UTF_8);
-    } else {
-      throw new IllegalArgumentException("Unknown threshold type: " + threshold.getClass());
+    public static boolean matches(SigningThreshold signingThreshold, List<PublicKey> nextKeys, KeyConfigurationDigest in) {
+        return digest(signingThreshold, nextKeys, in.algorithm()).equals(in);
     }
-  }
 
-  static String weight(Weight w) {
-    return w.denominator()
-        .map(d -> "%d/%d".formatted(w.numerator(), d))
-        .orElseGet(() -> String.valueOf(w.numerator()));
-  }
+    public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<PublicKey> nextKeys, DigestAlgorithm algo) {
+        var digOps = DigestOperations.lookup(algo);
+
+        var keyDigs = nextKeys.stream()
+                .map(QualifiedBase64::qb64)
+                .map(qb64 -> qb64.getBytes(UTF_8))
+                .map(digOps::digest)
+                .toList();
+
+        return digest(signingThreshold, keyDigs);
+    }
+
+    public static KeyConfigurationDigest digest(SigningThreshold signingThreshold, List<Digest> nextKeyDigests) {
+        var st = signingThresholdRepresentation(signingThreshold);
+        var digestAlgorithm = nextKeyDigests.get(0).algorithm();
+        var digOps = DigestOperations.lookup(digestAlgorithm);
+
+        var digest = digOps.digest(st).bytes();// digest
+        for (var d : nextKeyDigests) {
+            var keyDigest = d.bytes();
+            for (var i = keyDigest.length - 1; i >= 0; i--) {
+                digest[i] = (byte) (digest[i] ^ keyDigest[i]);
+            }
+        }
+
+        return new ImmutableKeyConfigurationDigest(new ImmutableDigest(nextKeyDigests.get(0).algorithm(), digest));
+    }
+
+    static byte[] signingThresholdRepresentation(SigningThreshold threshold) {
+        if (threshold instanceof SigningThreshold.Unweighted unweighted) {
+            return Hex.hexNoPad(unweighted.threshold()).getBytes(UTF_8);
+        } else if (threshold instanceof SigningThreshold.Weighted weighted) {
+            return Stream.of((weighted).weights())
+                    .map(lw -> Stream.of(lw)
+                            .map(KeyConfigurationDigester::weight)
+                            .collect(joining(",")))
+                    .collect(joining(("&")))
+                    .getBytes(UTF_8);
+        } else {
+            throw new IllegalArgumentException("Unknown threshold type: " + threshold.getClass());
+        }
+    }
+
+    static String weight(Weight w) {
+        return w.denominator()
+                .filter(d -> !d.equals(1))
+                .map(d -> "%d/%d".formatted(w.numerator(), d))
+                .orElseGet(() -> String.valueOf(w.numerator()));
+    }
 }

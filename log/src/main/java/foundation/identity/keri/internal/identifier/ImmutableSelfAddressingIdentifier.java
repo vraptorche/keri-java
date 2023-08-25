@@ -6,26 +6,12 @@ import foundation.identity.keri.crypto.Digest;
 
 import java.util.Objects;
 
-public record ImmutableSelfAddressingIdentifier(Digest digest) implements SelfAddressingIdentifier {
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
+public record ImmutableSelfAddressingIdentifier(
+        Digest digest
+) implements SelfAddressingIdentifier {
+    @Override
+    public String toString() {
+        return QualifiedBase64.qb64(this);
     }
-    if (obj == null) {
-      return false;
-    }
-    if (this.getClass() != obj.getClass()) {
-      return false;
-    }
-    var other = (ImmutableSelfAddressingIdentifier) obj;
-    return Objects.equals(this.digest, other.digest);
-  }
-
-  @Override
-  public String toString() {
-    return QualifiedBase64.qb64(this);
-  }
 
 }

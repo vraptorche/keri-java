@@ -4,7 +4,7 @@ import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
 import foundation.identity.keri.internal.event.ImmutableUnweightedSigningThreshold;
 import foundation.identity.keri.internal.event.ImmutableWeight;
-import foundation.identity.keri.internal.event.ImmutableWeightedSigningThreshold;
+import foundation.identity.keri.internal.event.WeightedSigningThresholdRecord;
 import org.apache.commons.math3.fraction.Fraction;
 
 import java.util.Arrays;
@@ -47,7 +47,7 @@ public class SigningThresholds {
       }
     }
 
-    return new ImmutableWeightedSigningThreshold(weightGroups);
+    return new WeightedSigningThresholdRecord(weightGroups);
   }
 
   private static boolean sumGreaterThanOrEqualToOne(Weight[] weights) {
@@ -63,9 +63,10 @@ public class SigningThresholds {
   public static Weight weight(String value) {
       var parts = value.split("/");
     if (parts.length == 1) {
-      return weight(Integer.parseInt(parts[0]));
+      return weight(Integer.parseInt(parts[0])).normalize();
     } else if (parts.length == 2) {
-      return weight(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+      Weight weight = weight(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+      return weight;
     } else {
       throw new IllegalArgumentException("invalid weight: " + value);
     }
@@ -84,7 +85,7 @@ public class SigningThresholds {
       throw new IllegalArgumentException("numerator must be > 0");
     }
 
-    return new ImmutableWeight(numerator, denominator);
+    return new ImmutableWeight(numerator, denominator).normalize();
   }
 
   public static Weight[] group(Weight... weights) {

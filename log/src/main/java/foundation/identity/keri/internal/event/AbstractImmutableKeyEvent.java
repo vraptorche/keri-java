@@ -5,6 +5,7 @@ import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyEvent;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
+import foundation.identity.keri.api.event.KeyEventCoordinatesRecord;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.crypto.Signature;
 
@@ -25,7 +26,7 @@ public abstract class AbstractImmutableKeyEvent implements KeyEvent {
   // for lazily computing the event's coordinates
   private Supplier<KeyEventCoordinates> coordinates = () -> {
     // with multiple threads this might be ran multiple times concurrently, and that's ok
-    var keyEventCoordinates = ImmutableKeyEventCoordinates.of(this);
+    var keyEventCoordinates = KeyEventCoordinatesRecord.of(this);
     this.coordinates = () -> keyEventCoordinates;
     return keyEventCoordinates;
   };

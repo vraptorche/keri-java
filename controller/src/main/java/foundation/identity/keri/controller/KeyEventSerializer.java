@@ -32,275 +32,276 @@ import static foundation.identity.keri.api.event.EventFieldNames.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class KeyEventSerializer {
-  public static final KeyEventSerializer INSTANCE = new KeyEventSerializer();
+    public static final KeyEventSerializer INSTANCE = new KeyEventSerializer();
 
-  private static final byte[] KERI_BYTES = "KERI".getBytes(UTF_8);
+    private static final byte[] KERI_BYTES = "KERI".getBytes(UTF_8);
 
-  private static final String INCEPTION_TYPE = "icp";
-  private static final String ROTATION_TYPE = "rot";
-  private static final String INTERACTION_TYPE = "ixn";
-  private static final String DELEGATED_INCEPTION_TYPE = "dip";
-  private static final String DELEGATED_ROTATION_TYPE = "drt";
-  private static final String RECEIPT_FROM_BASIC_TYPE = "rct";
-  private static final String RECEIPT_FROM_TRANSFERABLE_TYPE = "vrc";
+    private static final String INCEPTION_TYPE = "icp";
+    private static final String ROTATION_TYPE = "rot";
+    private static final String INTERACTION_TYPE = "ixn";
+    private static final String DELEGATED_INCEPTION_TYPE = "dip";
+    private static final String DELEGATED_ROTATION_TYPE = "drt";
+    private static final String RECEIPT_FROM_BASIC_TYPE = "rct";
+    private static final String RECEIPT_FROM_TRANSFERABLE_TYPE = "vrc";
 
-  private static final ObjectMapper JSON = new ObjectMapper();
-  private static final ObjectMapper CBOR = new ObjectMapper(new CBORFactory());
-  private static final ObjectMapper MESSAGE_PACK = new ObjectMapper(new MessagePackFactory());
+    private static final ObjectMapper JSON = new ObjectMapper();
+    private static final ObjectMapper CBOR = new ObjectMapper(new CBORFactory());
+    private static final ObjectMapper MESSAGE_PACK = new ObjectMapper(new MessagePackFactory());
 
-  static String identifierPlaceholder(IdentifierSpec spec) {
-    var derivation = spec.derivation();
-    if (derivation.isAssignableFrom(BasicIdentifier.class)) {
-      var publicKey = spec.keys().get(0);
-      var signatureAlgorithm = StandardSignatureAlgorithms.lookup(publicKey);
-      return QualifiedBase64.basicIdentifierPlaceholder(signatureAlgorithm);
-    } else if (derivation.isAssignableFrom(SelfAddressingIdentifier.class)) {
-      var digestAlgorithm = spec.selfAddressingDigestAlgorithm();
-      return QualifiedBase64.selfAddressingIdentifierPlaceholder(digestAlgorithm);
-    } else if (derivation.isAssignableFrom(SelfSigningIdentifier.class)) {
-      return QualifiedBase64.selfSigningIdentifierPlaceholder(spec.signer().algorithm());
-    } else {
-      throw new IllegalArgumentException("unknown prefix type: " + derivation.getCanonicalName());
+    static String identifierPlaceholder(IdentifierSpec spec) {
+        var derivation = spec.derivation();
+        if (derivation.isAssignableFrom(BasicIdentifier.class)) {
+            var publicKey = spec.keys().get(0);
+            var signatureAlgorithm = StandardSignatureAlgorithms.lookup(publicKey);
+            return QualifiedBase64.basicIdentifierPlaceholder(signatureAlgorithm);
+        } else if (derivation.isAssignableFrom(SelfAddressingIdentifier.class)) {
+            var digestAlgorithm = spec.selfAddressingDigestAlgorithm();
+            return QualifiedBase64.selfAddressingIdentifierPlaceholder(digestAlgorithm);
+        } else if (derivation.isAssignableFrom(SelfSigningIdentifier.class)) {
+            return QualifiedBase64.selfSigningIdentifierPlaceholder(spec.signer().algorithm());
+        } else {
+            throw new IllegalArgumentException("unknown prefix type: " + derivation.getCanonicalName());
+        }
     }
-  }
 
-  static String version(Version version, Format f, long size) {
-    return String.format("KERI%x%x%s%06x_", version.major(), version.minor(), format(f), size);
-  }
-
-  static String format(Format f) {
-    return switch (StandardFormats.lookup(f.formatName())) {
-      case CBOR -> "CBOR";
-      case JSON -> "JSON";
-      case MESSAGE_PACK -> "MGPK";
-    };
-  }
-
-  static ObjectNode seal(Seal seal, ObjectMapper mapper) {
-    var obj = mapper.createObjectNode();
-    if (seal instanceof KeyEventCoordinatesSeal kecs) {
-      obj.put("i", qb64(kecs.event().identifier()));
-      obj.put("s", hexNoPad(kecs.event().sequenceNumber()));
-      obj.put("d", qb64(kecs.event().digest()));
-    } else if ((seal instanceof DigestSeal ds)) {
-      obj.put("d", qb64(ds.digest()));
-    } else if (seal instanceof MerkleTreeRootSeal mtrs) {
-      obj.put("rd", qb64((mtrs).digest()));
-    } else {
-      throw new IllegalArgumentException("Unknown seal type: " + seal.getClass());
+    static String version(Version version, Format f, long size) {
+        return String.format("KERI%x%x%s%06x_", version.major(), version.minor(), format(f), size);
     }
-    return obj;
-  }
 
-  static JsonNode signingThreshold(SigningThreshold threshold, ObjectMapper mapper) {
-    if (threshold instanceof SigningThreshold.Unweighted unweighted) {
-      return mapper.getNodeFactory().textNode(Integer.toString(unweighted.threshold()));
-    } else if (threshold instanceof SigningThreshold.Weighted weighted) {
-      var groupArrayNodes = Stream.of(weighted.weights())
-          .map(lw -> {
-            var textNodes = Stream.of(lw)
-                .map(KeyEventSerializer::weight)
-                .map(str -> mapper.getNodeFactory().textNode(str))
-                .toList();
+    static String format(Format f) {
+        return switch (StandardFormats.lookup(f.formatName())) {
+            case CBOR -> "CBOR";
+            case JSON -> "JSON";
+            case MESSAGE_PACK -> "MGPK";
+        };
+    }
+
+    static ObjectNode seal(Seal seal, ObjectMapper mapper) {
+        var obj = mapper.createObjectNode();
+        if (seal instanceof KeyEventCoordinatesSeal kecs) {
+            obj.put("i", qb64(kecs.event().identifier()));
+            obj.put("s", hexNoPad(kecs.event().sequenceNumber()));
+            obj.put("d", qb64(kecs.event().digest()));
+        } else if ((seal instanceof DigestSeal ds)) {
+            obj.put("d", qb64(ds.digest()));
+        } else if (seal instanceof MerkleTreeRootSeal mtrs) {
+            obj.put("rd", qb64((mtrs).digest()));
+        } else {
+            throw new IllegalArgumentException("Unknown seal type: " + seal.getClass());
+        }
+        return obj;
+    }
+
+    static JsonNode signingThreshold(SigningThreshold threshold, ObjectMapper mapper) {
+        if (threshold instanceof SigningThreshold.Unweighted unweighted) {
+            return mapper.getNodeFactory().textNode(Integer.toString(unweighted.threshold()));
+        } else if (threshold instanceof SigningThreshold.Weighted weighted) {
+            var groupArrayNodes = Stream.of(weighted.weights())
+                    .map(lw -> {
+                        var textNodes = Stream.of(lw)
+                                .map(KeyEventSerializer::weight)
+                                .map(str -> mapper.getNodeFactory().textNode(str))
+                                .toList();
+                        return mapper.getNodeFactory().arrayNode()
+                                .addAll(textNodes);
+                    })
+                    .toList();
             return mapper.getNodeFactory().arrayNode()
-                .addAll(textNodes);
-          })
-          .toList();
-      return mapper.getNodeFactory().arrayNode()
-          .addAll(groupArrayNodes);
-    } else {
-      throw new IllegalArgumentException("Unknown SigningThreshold type: " + threshold.getClass());
-    }
-  }
-
-  static String weight(Weight w) {
-    return w.denominator()
-        .map(denominator -> "%d/%d".formatted(w.numerator(), denominator))
-        .orElseGet(() -> Integer.toString(w.numerator()));
-  }
-
-  static void writeSize(byte[] bytes) {
-    // version string is "KERIVVFFFFSSSSSS_"
-    // VV = version
-    // FFFF = format
-    // SSSSSS = size in hex
-    var sizeStart = indexOf(bytes, KERI_BYTES, 10) + 10;
-    var sizeStringBytes = String.format("%06x", bytes.length).getBytes(UTF_8);
-
-    bytes[sizeStart] = sizeStringBytes[0];
-    bytes[sizeStart + 1] = sizeStringBytes[1];
-    bytes[sizeStart + 2] = sizeStringBytes[2];
-    bytes[sizeStart + 3] = sizeStringBytes[3];
-    bytes[sizeStart + 4] = sizeStringBytes[4];
-    bytes[sizeStart + 5] = sizeStringBytes[5];
-  }
-
-  static int indexOf(byte[] a, byte[] b, int limit) {
-    for (var i = 0; (i < a.length) && (i < limit) && ((i + b.length) <= a.length); i++) {
-      if (Arrays.equals(a, i, i + b.length, b, 0, b.length)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  private ObjectMapper mapper(Format format) {
-    var stdFormat = (StandardFormats) format;
-    return switch (stdFormat) {
-      case CBOR -> CBOR;
-      case JSON -> JSON;
-      case MESSAGE_PACK -> MESSAGE_PACK;
-    };
-  }
-
-  public byte[] inceptionStatement(IdentifierSpec spec) {
-    return this.serialize(null, spec);
-  }
-
-  public byte[] serialize(Identifier identifier, IdentifierSpec spec) {
-    var mapper = this.mapper(spec.format());
-    var rootNode = mapper.createObjectNode();
-
-    rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
-    if (identifier == null) {
-      rootNode.put(IDENTIFIER.label(), identifierPlaceholder(spec));
-    } else {
-      rootNode.put(IDENTIFIER.label(), qb64(identifier));
-    }
-    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(0));
-    rootNode.put(EVENT_TYPE.label(), INCEPTION_TYPE);
-
-    rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
-
-    var keysNode = mapper.createArrayNode();
-    spec.keys().forEach(k -> keysNode.add(qb64(k)));
-    rootNode.set(KEYS.label(), keysNode);
-
-    if (KeyConfigurationDigest.NONE.equals(spec.nextKeys())) {
-      rootNode.put(NEXT_KEYS_DIGEST.label(), "");
-    } else {
-      rootNode.put(NEXT_KEYS_DIGEST.label(), qb64(spec.nextKeys()));
+                    .addAll(groupArrayNodes);
+        } else {
+            throw new IllegalArgumentException("Unknown SigningThreshold type: " + threshold.getClass());
+        }
     }
 
-    rootNode.put(WITNESS_THRESHOLD.label(), hexNoPad(spec.witnessThreshold()));
-    var witnessesNode = mapper.createArrayNode();
-    if (!spec.witnesses().isEmpty()) {
-      spec.witnesses().forEach(w -> witnessesNode.add(qb64(w)));
-    }
-    rootNode.set(WITNESSES.label(), witnessesNode);
-
-    rootNode.set(CONFIGURATION.label(), mapper.createArrayNode()); // TODO
-
-
-    try {
-      var bytes = mapper.writeValueAsBytes(rootNode);
-      writeSize(bytes);
-      return bytes;
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  public byte[] serialize(RotationSpec spec) {
-    var mapper = this.mapper(spec.format());
-    var rootNode = mapper.createObjectNode();
-
-    rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
-    rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), ROTATION_TYPE);
-    rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
-
-    rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
-
-    var keysNode = mapper.createArrayNode();
-    spec.keys().forEach(k -> keysNode.add(qb64(k)));
-    rootNode.set(KEYS.label(), keysNode);
-
-    if (KeyConfigurationDigest.NONE.equals(spec.nextKeys())) {
-      rootNode.put(NEXT_KEYS_DIGEST.label(), "");
-    } else {
-      rootNode.put(NEXT_KEYS_DIGEST.label(), qb64(spec.nextKeys()));
+    static String weight(Weight w) {
+        return w.denominator()
+                .filter(d -> !d.equals(1))
+                .map(denominator -> "%d/%d".formatted(w.numerator(), denominator))
+                .orElseGet(() -> Integer.toString(w.numerator()));
     }
 
-    rootNode.put(WITNESS_THRESHOLD.label(), hexNoPad(spec.witnessThreshold()));
+    static void writeSize(byte[] bytes) {
+        // version string is "KERIVVFFFFSSSSSS_"
+        // VV = version
+        // FFFF = format
+        // SSSSSS = size in hex
+        var sizeStart = indexOf(bytes, KERI_BYTES, 10) + 10;
+        var sizeStringBytes = String.format("%06x", bytes.length).getBytes(UTF_8);
 
-    var removedWitnessesNode = mapper.createArrayNode();
-    spec.removedWitnesses().forEach(w -> removedWitnessesNode.add(qb64(w)));
-    rootNode.set(WITNESSES_REMOVED.label(), removedWitnessesNode);
-
-    var addedWitnessesNode = mapper.createArrayNode();
-    spec.addedWitnesses().forEach(w -> addedWitnessesNode.add(qb64(w)));
-    rootNode.set(WITNESSES_ADDED.label(), addedWitnessesNode);
-
-    var sealsNode = mapper.createArrayNode();
-    spec.seals().forEach(s -> sealsNode.add(seal(s, mapper)));
-    rootNode.set(ANCHORS.label(), sealsNode);
-
-    try {
-      var bytes = mapper.writeValueAsBytes(rootNode);
-      writeSize(bytes);
-      return bytes;
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  public byte[] serialize(InteractionSpec spec) {
-    var mapper = this.mapper(spec.format());
-    var rootNode = mapper.createObjectNode();
-
-    rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
-    rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), INTERACTION_TYPE);
-    rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
-
-    var sealsNode = mapper.createArrayNode();
-    spec.seals().forEach(s -> sealsNode.add(seal(s, mapper)));
-    rootNode.set(ANCHORS.label(), sealsNode);
-
-    try {
-      var bytes = mapper.writeValueAsBytes(rootNode);
-      writeSize(bytes);
-      return bytes;
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  public byte[] serialize(AttachmentEvent event) {
-    var mapper = this.mapper(StandardFormats.JSON);
-    var rootNode = mapper.createObjectNode();
-
-    var vrc = event.authentication().isEmpty()
-        && event.endorsements().isEmpty()
-        && event.receipts().size() == 1;
-
-    rootNode.put(VERSION.label(), version(Version.CURRENT, StandardFormats.JSON, 0));
-    rootNode.put(IDENTIFIER.label(), qb64(event.coordinates().identifier()));
-    rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(event.coordinates().sequenceNumber()));
-    rootNode.put(EVENT_TYPE.label(), vrc ? RECEIPT_FROM_TRANSFERABLE_TYPE : RECEIPT_FROM_BASIC_TYPE);
-    rootNode.put(EVENT_DIGEST.label(), qb64(event.coordinates().digest()));
-
-    if (vrc) {
-      var vrcSigs = event.receipts().entrySet().stream().findFirst().get();
-      var establishmentEvent = vrcSigs.getKey();
-      var anchorNode = mapper.createObjectNode();
-      anchorNode.put(IDENTIFIER.label(), qb64(establishmentEvent.identifier()));
-      anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(establishmentEvent.sequenceNumber()));
-      anchorNode.put(EVENT_DIGEST.label(), qb64(establishmentEvent.digest()));
-      rootNode.set(ANCHORS.label(), anchorNode);
+        bytes[sizeStart] = sizeStringBytes[0];
+        bytes[sizeStart + 1] = sizeStringBytes[1];
+        bytes[sizeStart + 2] = sizeStringBytes[2];
+        bytes[sizeStart + 3] = sizeStringBytes[3];
+        bytes[sizeStart + 4] = sizeStringBytes[4];
+        bytes[sizeStart + 5] = sizeStringBytes[5];
     }
 
-    try {
-      var bytes = mapper.writeValueAsBytes(rootNode);
-      writeSize(bytes);
-      return bytes;
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(e);
+    static int indexOf(byte[] a, byte[] b, int limit) {
+        for (var i = 0; (i < a.length) && (i < limit) && ((i + b.length) <= a.length); i++) {
+            if (Arrays.equals(a, i, i + b.length, b, 0, b.length)) {
+                return i;
+            }
+        }
+        return -1;
     }
-  }
+
+    private ObjectMapper mapper(Format format) {
+        var stdFormat = (StandardFormats) format;
+        return switch (stdFormat) {
+            case CBOR -> CBOR;
+            case JSON -> JSON;
+            case MESSAGE_PACK -> MESSAGE_PACK;
+        };
+    }
+
+    public byte[] inceptionStatement(IdentifierSpec spec) {
+        return this.serialize(null, spec);
+    }
+
+    public byte[] serialize(Identifier identifier, IdentifierSpec spec) {
+        var mapper = this.mapper(spec.format());
+        var rootNode = mapper.createObjectNode();
+
+        rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
+        if (identifier == null) {
+            rootNode.put(IDENTIFIER.label(), identifierPlaceholder(spec));
+        } else {
+            rootNode.put(IDENTIFIER.label(), qb64(identifier));
+        }
+        rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(0));
+        rootNode.put(EVENT_TYPE.label(), INCEPTION_TYPE);
+
+        rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
+
+        var keysNode = mapper.createArrayNode();
+        spec.keys().forEach(k -> keysNode.add(qb64(k)));
+        rootNode.set(KEYS.label(), keysNode);
+
+        if (KeyConfigurationDigest.NONE.equals(spec.nextKeys())) {
+            rootNode.put(NEXT_KEYS_DIGEST.label(), "");
+        } else {
+            rootNode.put(NEXT_KEYS_DIGEST.label(), qb64(spec.nextKeys()));
+        }
+
+        rootNode.put(WITNESS_THRESHOLD.label(), hexNoPad(spec.witnessThreshold()));
+        var witnessesNode = mapper.createArrayNode();
+        if (!spec.witnesses().isEmpty()) {
+            spec.witnesses().forEach(w -> witnessesNode.add(qb64(w)));
+        }
+        rootNode.set(WITNESSES.label(), witnessesNode);
+
+        rootNode.set(CONFIGURATION.label(), mapper.createArrayNode()); // TODO
+
+
+        try {
+            var bytes = mapper.writeValueAsBytes(rootNode);
+            writeSize(bytes);
+            return bytes;
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public byte[] serialize(RotationSpec spec) {
+        var mapper = this.mapper(spec.format());
+        var rootNode = mapper.createObjectNode();
+
+        rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
+        rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
+        rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
+        rootNode.put(EVENT_TYPE.label(), ROTATION_TYPE);
+        rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
+
+        rootNode.set(SIGNING_THRESHOLD.label(), signingThreshold(spec.signingThreshold(), mapper));
+
+        var keysNode = mapper.createArrayNode();
+        spec.keys().forEach(k -> keysNode.add(qb64(k)));
+        rootNode.set(KEYS.label(), keysNode);
+
+        if (KeyConfigurationDigest.NONE.equals(spec.nextKeys())) {
+            rootNode.put(NEXT_KEYS_DIGEST.label(), "");
+        } else {
+            rootNode.put(NEXT_KEYS_DIGEST.label(), qb64(spec.nextKeys()));
+        }
+
+        rootNode.put(WITNESS_THRESHOLD.label(), hexNoPad(spec.witnessThreshold()));
+
+        var removedWitnessesNode = mapper.createArrayNode();
+        spec.removedWitnesses().forEach(w -> removedWitnessesNode.add(qb64(w)));
+        rootNode.set(WITNESSES_REMOVED.label(), removedWitnessesNode);
+
+        var addedWitnessesNode = mapper.createArrayNode();
+        spec.addedWitnesses().forEach(w -> addedWitnessesNode.add(qb64(w)));
+        rootNode.set(WITNESSES_ADDED.label(), addedWitnessesNode);
+
+        var sealsNode = mapper.createArrayNode();
+        spec.seals().forEach(s -> sealsNode.add(seal(s, mapper)));
+        rootNode.set(ANCHORS.label(), sealsNode);
+
+        try {
+            var bytes = mapper.writeValueAsBytes(rootNode);
+            writeSize(bytes);
+            return bytes;
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public byte[] serialize(InteractionSpec spec) {
+        var mapper = this.mapper(spec.format());
+        var rootNode = mapper.createObjectNode();
+
+        rootNode.put(VERSION.label(), version(Version.CURRENT, spec.format(), 0));
+        rootNode.put(IDENTIFIER.label(), qb64(spec.identifier()));
+        rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(spec.sequenceNumber()));
+        rootNode.put(EVENT_TYPE.label(), INTERACTION_TYPE);
+        rootNode.put(PRIOR_EVENT_DIGEST.label(), qb64(spec.previous().digest()));
+
+        var sealsNode = mapper.createArrayNode();
+        spec.seals().forEach(s -> sealsNode.add(seal(s, mapper)));
+        rootNode.set(ANCHORS.label(), sealsNode);
+
+        try {
+            var bytes = mapper.writeValueAsBytes(rootNode);
+            writeSize(bytes);
+            return bytes;
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public byte[] serialize(AttachmentEvent event) {
+        var mapper = this.mapper(StandardFormats.JSON);
+        var rootNode = mapper.createObjectNode();
+
+        var vrc = event.authentication().isEmpty()
+                && event.endorsements().isEmpty()
+                && event.receipts().size() == 1;
+
+        rootNode.put(VERSION.label(), version(Version.CURRENT, StandardFormats.JSON, 0));
+        rootNode.put(IDENTIFIER.label(), qb64(event.coordinates().identifier()));
+        rootNode.put(SEQUENCE_NUMBER.label(), hexNoPad(event.coordinates().sequenceNumber()));
+        rootNode.put(EVENT_TYPE.label(), vrc ? RECEIPT_FROM_TRANSFERABLE_TYPE : RECEIPT_FROM_BASIC_TYPE);
+        rootNode.put(EVENT_DIGEST.label(), qb64(event.coordinates().digest()));
+
+        if (vrc) {
+            var vrcSigs = event.receipts().entrySet().stream().findFirst().get();
+            var establishmentEvent = vrcSigs.getKey();
+            var anchorNode = mapper.createObjectNode();
+            anchorNode.put(IDENTIFIER.label(), qb64(establishmentEvent.identifier()));
+            anchorNode.put(SEQUENCE_NUMBER.label(), hexNoPad(establishmentEvent.sequenceNumber()));
+            anchorNode.put(EVENT_DIGEST.label(), qb64(establishmentEvent.digest()));
+            rootNode.set(ANCHORS.label(), anchorNode);
+        }
+
+        try {
+            var bytes = mapper.writeValueAsBytes(rootNode);
+            writeSize(bytes);
+            return bytes;
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
 /*  public byte[] serialize(ReceiptFromTransferableIdentifierSpec spec) {
     var mapper = this.mapper(spec.format());

@@ -19,8 +19,8 @@ import foundation.identity.keri.crypto.SignatureAlgorithm;
 import foundation.identity.keri.crypto.SignatureOperations;
 import foundation.identity.keri.crypto.StandardDigestAlgorithms;
 import foundation.identity.keri.crypto.StandardSignatureAlgorithms;
-import foundation.identity.keri.internal.event.ImmutableEventSignature;
-import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
+import foundation.identity.keri.internal.event.EventSignatureRecord;
+import foundation.identity.keri.internal.event.KeyCoordinatesRecord;
 
 import java.security.KeyPair;
 import java.security.SecureRandom;
@@ -74,7 +74,7 @@ public final class Controller {
     var event = this.eventFactory.inception(spec);
     this.keyEventValidator.process(event);
 
-    var keyCoordinates = ImmutableKeyCoordinates.of(event, 0);
+    var keyCoordinates = KeyCoordinatesRecord.of(event, 0);
     this.keyStore.storeKey(keyCoordinates, initialKeyPair);
     this.keyStore.storeNextKey(keyCoordinates, nextKeyPair);
 
@@ -99,7 +99,7 @@ public final class Controller {
     var event = this.eventFactory.inception(spec);
     var newState = this.keyEventValidator.process(event);
 
-    var keyCoordinates = ImmutableKeyCoordinates.of(event, 0);
+    var keyCoordinates = KeyCoordinatesRecord.of(event, 0);
 
     this.keyStore.storeKey(keyCoordinates, initialKeyPair);
     this.keyStore.storeNextKey(keyCoordinates, nextKeyPair);
@@ -128,7 +128,7 @@ public final class Controller {
       throw new IllegalArgumentException("identifier cannot be rotated");
     }
 
-    var currentKeyCoordinates = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
+    var currentKeyCoordinates = KeyCoordinatesRecord.of(state.lastEstablishmentEvent(), 0);
     var nextKeyPair = this.keyStore.getNextKey(currentKeyCoordinates);
 
     if (nextKeyPair.isEmpty()) {
@@ -149,7 +149,7 @@ public final class Controller {
     var event = this.eventFactory.rotation(spec);
     var newState = this.keyEventValidator.process(event);
 
-    var nextKeyCoordinates = ImmutableKeyCoordinates.of(event, 0);
+    var nextKeyCoordinates = KeyCoordinatesRecord.of(event, 0);
     this.keyStore.storeKey(nextKeyCoordinates, nextKeyPair.get());
     this.keyStore.storeNextKey(nextKeyCoordinates, newNextKeyPair);
     this.keyStore.removeKey(currentKeyCoordinates);
@@ -166,7 +166,7 @@ public final class Controller {
       throw new IllegalArgumentException("identifier not found in event store");
     }
 
-    var currentKeyCoordinates = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
+    var currentKeyCoordinates = KeyCoordinatesRecord.of(state.lastEstablishmentEvent(), 0);
     var keyPair = this.keyStore.getKey(currentKeyCoordinates);
 
     if (keyPair.isEmpty()) {
@@ -186,14 +186,14 @@ public final class Controller {
     var state = this.keyEventStore.getKeyState(identifier)
         .orElseThrow(() -> new IllegalArgumentException("identifier not found in event store"));
 
-    var keyCoords = ImmutableKeyCoordinates.of(state.lastEstablishmentEvent(), 0);
+    var keyCoords = KeyCoordinatesRecord.of(state.lastEstablishmentEvent(), 0);
     var keyPair = this.keyStore.getKey(keyCoords)
         .orElseThrow(() -> new IllegalArgumentException("key pair not found for prefix: " + identifier));
 
     var ops = SignatureOperations.lookup(keyPair.getPrivate());
     var signature = ops.sign(event.bytes(), keyPair.getPrivate());
 
-    return new ImmutableEventSignature(
+    return new EventSignatureRecord(
         event.coordinates(),
         state.lastEstablishmentEvent().coordinates(),
         Map.of(0, signature));

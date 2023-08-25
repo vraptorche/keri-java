@@ -2,6 +2,7 @@ package foundation.identity.keri;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import foundation.identity.keri.api.event.SigningThreshold;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -15,43 +16,45 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @DisplayNameGeneration(ReplaceUnderscores.class)
 class KeyEventDeserializerTest {
 
-  final ObjectMapper mapper = new ObjectMapper();
+    final ObjectMapper mapper = new ObjectMapper();
 
-  @Test
-  void test__readSigningThreshold__unweighted() throws JsonProcessingException {
-    assertEquals(
-        unweighted(1),
-        readSigningThreshold(this.mapper.readTree("\"1\"")));
+    @Test
+    void test__readSigningThreshold__unweighted() throws JsonProcessingException {
+        assertEquals(
+                unweighted(1),
+                readSigningThreshold(this.mapper.readTree("\"1\"")));
 
-    assertEquals(
-        unweighted(2),
-        readSigningThreshold(this.mapper.readTree("\"2\"")));
+        assertEquals(
+                unweighted(2),
+                readSigningThreshold(this.mapper.readTree("\"2\"")));
 
-    assertEquals(
-        unweighted(3),
-        readSigningThreshold(this.mapper.readTree("\"3\"")));
-  }
+        assertEquals(
+                unweighted(3),
+                readSigningThreshold(this.mapper.readTree("\"3\"")));
+    }
 
-  @Test
-  void test__readSigningThreshold__weighted() throws JsonProcessingException {
+    @Test
+    void test_readSigningThreshold_weighted() throws JsonProcessingException {
 
-    // ["1/2", "1/2", "1/4", "1/4", "1/4"]
-    assertEquals(
-        weighted("1/2", "1/2", "1/4", "1/4", "1/4"),
-        readSigningThreshold(this.mapper.readTree("[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"]")));
+        // ["1/2", "1/2", "1/4", "1/4", "1/4"]
+        assertEquals(
+                weighted("1/2", "1/2", "1/4", "1/4", "1/4"),
+                readSigningThreshold(this.mapper.readTree("[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"]")));
 
-    // [["1/2", "1/2", "1/4", "1/4", "1/4"]]
-    assertEquals(
-        weighted(
-            group("1/2", "1/2", "1/4", "1/4", "1/4")),
-        readSigningThreshold(this.mapper.readTree("[[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"]]")));
+        // [["1/2", "1/2", "1/4", "1/4", "1/4"]]
+        assertEquals(
+                weighted(
+                        group("1/2", "1/2", "1/4", "1/4", "1/4")),
+                readSigningThreshold(this.mapper.readTree("[[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"]]")));
 
-    // [["1/2","1/2","1/4","1/4","1/4"],["1","1"]]
-    assertEquals(
-        weighted(
-            group("1/2", "1/2", "1/4", "1/4", "1/4"),
-            group("1", "1")),
-        readSigningThreshold(this.mapper.readTree("[[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"],[\"1\",\"1\"]]")));
-  }
+        // [["1/2","1/2","1/4","1/4","1/4"],["1","1"]]
+        SigningThreshold signingThreshold = readSigningThreshold(this.mapper.readTree("[[\"1/2\",\"1/2\",\"1/4\",\"1/4\",\"1/4\"],[\"1\",\"1\"]]"));
+        SigningThreshold.Weighted weighted = weighted(
+                group("1/2", "1/2", "1/4", "1/4", "1/4"),
+                group("1", "1"));
+        assertEquals(
+                weighted,
+                signingThreshold);
+    }
 
 }

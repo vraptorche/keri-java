@@ -17,6 +17,8 @@ public interface SigningThreshold {
     interface Weight {
       int numerator();
       Optional<Integer> denominator();
+
+      Weight normalize();
     }
   }
 

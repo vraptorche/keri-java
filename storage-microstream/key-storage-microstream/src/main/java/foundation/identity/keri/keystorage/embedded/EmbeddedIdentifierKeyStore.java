@@ -2,7 +2,7 @@ package foundation.identity.keri.keystorage.embedded;
 
 import foundation.identity.keri.IdentifierKeyStore;
 import foundation.identity.keri.api.event.KeyCoordinates;
-import foundation.identity.keri.internal.event.ImmutableKeyCoordinates;
+import foundation.identity.keri.internal.event.KeyCoordinatesRecord;
 import one.microstream.storage.types.StorageManager;
 
 import java.security.KeyPair;
@@ -20,7 +20,7 @@ public class EmbeddedIdentifierKeyStore implements IdentifierKeyStore {
     public void storeKey(KeyCoordinates keyCoordinates, KeyPair keyPair) {
         // TODO: 3/30/2023 Implement
         KeysDataRoot dataRoot = (KeysDataRoot) storageManager.root();
-        dataRoot.keys().put(ImmutableKeyCoordinates.convert(keyCoordinates), keyPair);
+        dataRoot.keys().put(KeyCoordinatesRecord.convert(keyCoordinates), keyPair);
     }
 
     @Override

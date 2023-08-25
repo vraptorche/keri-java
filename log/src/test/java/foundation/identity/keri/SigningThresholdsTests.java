@@ -1,5 +1,6 @@
 package foundation.identity.keri;
 
+import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.event.SigningThreshold.Weighted.Weight;
 import foundation.identity.keri.internal.event.ImmutableWeight;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -36,8 +37,8 @@ class SigningThresholdsTests {
     assertThrows(IllegalArgumentException.class, () -> weight(-1));
     assertThrows(IllegalArgumentException.class, () -> weight(0));
 
-    assertEquals(new ImmutableWeight(1, null), weight(1));
-    assertEquals(new ImmutableWeight(2, null), weight(2));
+    assertEquals(new ImmutableWeight(1, 1), weight(1));
+    assertEquals(new ImmutableWeight(2, 1), weight(2));
     assertEquals(new ImmutableWeight(1, 1), weight(1, 1));
     assertEquals(new ImmutableWeight(1, 2), weight(1, 2));
     assertEquals(new ImmutableWeight(1, 3), weight(1, 3));
@@ -75,7 +76,9 @@ class SigningThresholdsTests {
 
   @Test
   void test__weighted() {
-    assertEquals(weighted(group("1")), weighted("1"));
+    SigningThreshold.Weighted weightedGroup = weighted(group("1"));
+    SigningThreshold.Weighted weighted = weighted("1");
+    assertEquals(weightedGroup, weighted);
 
     assertEquals(
         weighted(
