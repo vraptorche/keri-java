@@ -94,7 +94,7 @@ public class EcDSAOperations implements SignatureOperations {
 
 	@Override
 	public Signature signature(byte[] signatureBytes) {
-		return new ImmutableSignature(StandardSignatureAlgorithms.EC_SECP256K1, signatureBytes);
+		return new SignatureRecord(StandardSignatureAlgorithms.EC_SECP256K1, signatureBytes);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class EcDSAOperations implements SignatureOperations {
 			sig.update(message);
 			var bytes = sig.sign();
 
-			return new ImmutableSignature(this.signatureAlgorithm, bytes);
+			return new SignatureRecord(this.signatureAlgorithm, bytes);
 		} catch (GeneralSecurityException e) {
 			// TODO handle better
 			throw new IllegalStateException(e);

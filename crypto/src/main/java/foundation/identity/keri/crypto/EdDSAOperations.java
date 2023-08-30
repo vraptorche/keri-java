@@ -20,157 +20,154 @@ import java.util.Arrays;
 
 public class EdDSAOperations implements SignatureOperations {
 
-  private static final String EDDSA_ALGORITHM_NAME = "EdDSA";
+    private static final String EDDSA_ALGORITHM_NAME = "EdDSA";
 
-  final SignatureAlgorithm signatureAlgorithm;
-  final NamedParameterSpec parameterSpec;
-  final KeyPairGenerator keyPairGenerator;
-  final KeyFactory keyFactory;
+    final SignatureAlgorithm signatureAlgorithm;
+    final NamedParameterSpec parameterSpec;
+    final KeyPairGenerator keyPairGenerator;
+    final KeyFactory keyFactory;
 
-  public EdDSAOperations(SignatureAlgorithm signatureAlgorithm) {
-    try {
-      this.signatureAlgorithm = signatureAlgorithm;
+    public EdDSAOperations(SignatureAlgorithm signatureAlgorithm) {
+        try {
+            this.signatureAlgorithm = signatureAlgorithm;
 
-      var curveName = ((EdDSAParameters) signatureAlgorithm.parameters()).curveName().toLowerCase();
-      this.parameterSpec = switch (curveName) {
-        case "ed25519" -> NamedParameterSpec.ED25519;
-        case "ed448" -> NamedParameterSpec.ED448;
-        default -> throw new IllegalArgumentException("Unknown Edwards curve: " + curveName);
-      };
-      this.keyPairGenerator = KeyPairGenerator.getInstance(EDDSA_ALGORITHM_NAME);
-      this.keyPairGenerator.initialize(this.parameterSpec);
-      this.keyFactory = KeyFactory.getInstance(EDDSA_ALGORITHM_NAME);
-    } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-      throw new IllegalStateException(e);
+            var curveName = ((EdDSAParameters) signatureAlgorithm.parameters()).curveName().toLowerCase();
+            this.parameterSpec = switch (curveName) {
+                case "ed25519" -> NamedParameterSpec.ED25519;
+                case "ed448" -> NamedParameterSpec.ED448;
+                default -> throw new IllegalArgumentException("Unknown Edwards curve: " + curveName);
+            };
+            this.keyPairGenerator = KeyPairGenerator.getInstance(EDDSA_ALGORITHM_NAME);
+            this.keyPairGenerator.initialize(this.parameterSpec);
+            this.keyFactory = KeyFactory.getInstance(EDDSA_ALGORITHM_NAME);
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+            throw new IllegalStateException(e);
+        }
     }
-  }
 
-  private static EdECPoint decodeEdPoint(byte[] in) {
-    var arr = in.clone();
-    var msb = arr[arr.length - 1];
-    arr[arr.length - 1] &= (byte) 0x7F;
-    var xOdd = (msb & 0x80) != 0;
-    reverse(arr);
-    var y = new BigInteger(1, arr);
-    return new EdECPoint(xOdd, y);
-  }
-
-  private static void swap(byte[] arr, int i, int j) {
-    var tmp = arr[i];
-    arr[i] = arr[j];
-    arr[j] = tmp;
-  }
-
-  private static void reverse(byte[] arr) {
-    var i = 0;
-    var j = arr.length - 1;
-
-    while (i < j) {
-      swap(arr, i, j);
-      i++;
-      j--;
+    private static EdECPoint decodeEdPoint(byte[] in) {
+        var arr = in.clone();
+        var msb = arr[arr.length - 1];
+        arr[arr.length - 1] &= (byte) 0x7F;
+        var xOdd = (msb & 0x80) != 0;
+        reverse(arr);
+        var y = new BigInteger(1, arr);
+        return new EdECPoint(xOdd, y);
     }
-  }
 
-  @Override
-  public KeyPair generateKeyPair() {
-    return this.keyPairGenerator.generateKeyPair();
-  }
-
-  @Override
-  public KeyPair generateKeyPair(SecureRandom secureRandom) {
-    try {
-      var kpg = KeyPairGenerator.getInstance(EDDSA_ALGORITHM_NAME);
-      kpg.initialize(this.parameterSpec, secureRandom);
-      return kpg.generateKeyPair();
-    } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
-      throw new IllegalStateException(e);
+    private static void swap(byte[] arr, int i, int j) {
+        var tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
     }
-  }
 
-  @Override
-  public byte[] encode(PublicKey publicKey) {
-    var point = ((EdECPublicKey) publicKey).getPoint();
-    var encodedPoint = point.getY().toByteArray();
+    private static void reverse(byte[] arr) {
+        var i = 0;
+        var j = arr.length - 1;
 
-    reverse(encodedPoint);
-    encodedPoint = Arrays.copyOf(encodedPoint, this.keyLength());
-    var msb = (byte) (point.isXOdd() ? 0x80 : 0);
-    encodedPoint[encodedPoint.length - 1] |= msb;
-
-    return encodedPoint;
-  }
-
-  private int keyLength() {
-    final String curveName = this.parameterSpec.getName();
-    if (curveName.equals("Ed25519")) {
-      return StandardSignatureAlgorithms.ED_25519.publicKeyLength();
-    } else if (curveName.equals("Ed448")) {
-      return StandardSignatureAlgorithms.ED_448.publicKeyLength();
-    } else {
-      // TODO handle better
-      throw new IllegalArgumentException("Unknown Edwards curve: " + curveName);
+        while (i < j) {
+            swap(arr, i, j);
+            i++;
+            j--;
+        }
     }
-  }
 
-  @Override
-  public PublicKey publicKey(byte[] bytes) {
-    try {
-      if (bytes.length != this.keyLength()) {
-        throw new IllegalArgumentException(new InvalidKeyException("key length is " + bytes.length +
-            ", key length must be " + this.keyLength()));
-      }
-
-      var point = decodeEdPoint(bytes);
-
-      return this.keyFactory.generatePublic(new EdECPublicKeySpec(this.parameterSpec, point));
-    } catch (GeneralSecurityException e) {
-      // TODO handle better
-      throw new IllegalStateException(e);
+    @Override
+    public KeyPair generateKeyPair() {
+        return this.keyPairGenerator.generateKeyPair();
     }
-  }
 
-  @Override
-  public PrivateKey privateKey(byte[] bytes) {
-    try {
-      return this.keyFactory.generatePrivate(new EdECPrivateKeySpec(this.parameterSpec, bytes));
-    } catch (GeneralSecurityException e) {
-      // TODO handle better
-      throw new IllegalStateException(e);
+    @Override
+    public KeyPair generateKeyPair(SecureRandom secureRandom) {
+        try {
+            var kpg = KeyPairGenerator.getInstance(EDDSA_ALGORITHM_NAME);
+            kpg.initialize(this.parameterSpec, secureRandom);
+            return kpg.generateKeyPair();
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
+            throw new IllegalStateException(e);
+        }
     }
-  }
 
-  @Override
-  public Signature signature(byte[] signatureBytes) {
-    return new ImmutableSignature(this.signatureAlgorithm, signatureBytes);
-  }
-
-  @Override
-  public Signature sign(byte[] message, PrivateKey privateKey) {
-    try {
-      var sig = java.security.Signature.getInstance(EDDSA_ALGORITHM_NAME);
-      sig.initSign(privateKey);
-      sig.update(message);
-      var bytes = sig.sign();
-
-      return new ImmutableSignature(this.signatureAlgorithm, bytes);
-    } catch (GeneralSecurityException e) {
-      // TODO handle better
-      throw new IllegalStateException(e);
+    @Override
+    public byte[] encode(PublicKey publicKey) {
+        if (publicKey instanceof EdECPublicKey ecPublicKey) {
+            var point = ecPublicKey.getPoint();
+            var encodedPoint = point.getY().toByteArray();
+            reverse(encodedPoint);
+            encodedPoint = Arrays.copyOf(encodedPoint, this.keyLength());
+            var msb = (byte) (point.isXOdd() ? 0x80 : 0);
+            encodedPoint[encodedPoint.length - 1] |= msb;
+            return encodedPoint;
+        }
+        throw new IllegalArgumentException("Wrong public key type");
     }
-  }
 
-  @Override
-  public boolean verify(byte[] message, Signature signature, PublicKey publicKey) {
-    try {
-      var sig = java.security.Signature.getInstance(EDDSA_ALGORITHM_NAME);
-      sig.initVerify(publicKey);
-      sig.update(message);
-      return sig.verify(signature.bytes());
-    } catch (GeneralSecurityException e) {
-      // TODO handle better
-      throw new IllegalStateException(e);
+    private int keyLength() {
+        final String curveName = this.parameterSpec.getName();
+        if (curveName.equals("Ed25519")) {
+            return StandardSignatureAlgorithms.ED_25519.publicKeyLength();
+        } else if (curveName.equals("Ed448")) {
+            return StandardSignatureAlgorithms.ED_448.publicKeyLength();
+        } else {
+            // TODO handle better
+            throw new IllegalArgumentException("Unknown Edwards curve: " + curveName);
+        }
     }
-  }
+
+    @Override
+    public PublicKey publicKey(byte[] bytes) {
+        try {
+            if (bytes.length != this.keyLength()) {
+                throw new IllegalArgumentException(new InvalidKeyException("key length is %d, key length must be %d".formatted(bytes.length, this.keyLength())));
+            }
+            var point = decodeEdPoint(bytes);
+            return this.keyFactory.generatePublic(new EdECPublicKeySpec(this.parameterSpec, point));
+        } catch (GeneralSecurityException e) {
+            // TODO handle better
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public PrivateKey privateKey(byte[] bytes) {
+        try {
+            return this.keyFactory.generatePrivate(new EdECPrivateKeySpec(this.parameterSpec, bytes));
+        } catch (GeneralSecurityException e) {
+            // TODO handle better
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public Signature signature(byte[] signatureBytes) {
+        return new SignatureRecord(this.signatureAlgorithm, signatureBytes);
+    }
+
+    @Override
+    public Signature sign(byte[] message, PrivateKey privateKey) {
+        try {
+            var sig = java.security.Signature.getInstance(EDDSA_ALGORITHM_NAME);
+            sig.initSign(privateKey);
+            sig.update(message);
+            var bytes = sig.sign();
+            return new SignatureRecord(this.signatureAlgorithm, bytes);
+        } catch (GeneralSecurityException e) {
+            // TODO handle better
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public boolean verify(byte[] message, Signature signature, PublicKey publicKey) {
+        try {
+            var sig = java.security.Signature.getInstance(EDDSA_ALGORITHM_NAME);
+            sig.initVerify(publicKey);
+            sig.update(message);
+            return sig.verify(signature.bytes());
+        } catch (GeneralSecurityException e) {
+            // TODO handle better
+            throw new IllegalStateException(e);
+        }
+    }
 
 }

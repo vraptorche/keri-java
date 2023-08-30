@@ -64,7 +64,7 @@ public enum StandardSignatureAlgorithms implements SignatureAlgorithm {
       case "EdDSA" -> lookupEd(((EdECPublicKey) publicKey).getParams());
       case "Ed25519" -> ED_25519;
       case "Ed448" -> ED_448;
-      default -> throw new IllegalArgumentException("Unknown algorithm: " + publicKey.getAlgorithm());
+      default -> throw new IllegalArgumentException("Unknown algorithm: %s".formatted(publicKey.getAlgorithm()));
     };
   }
 
@@ -74,7 +74,7 @@ public enum StandardSignatureAlgorithms implements SignatureAlgorithm {
       case "EdDSA" -> lookupEd(((EdECPrivateKey) privateKey).getParams());
       case "Ed25519" -> ED_25519;
       case "Ed448" -> ED_448;
-      default -> throw new IllegalArgumentException("Unknown algorithm: " + privateKey.getAlgorithm());
+      default -> throw new IllegalArgumentException("Unknown algorithm: %s".formatted(privateKey.getAlgorithm()));
     };
   }
 
@@ -88,7 +88,7 @@ public enum StandardSignatureAlgorithms implements SignatureAlgorithm {
         case "1.3.132.0.10", "secp256k1":
           yield EC_SECP256K1;
         default:
-          throw new IllegalArgumentException("Unknown EC curve: " + curveName);
+          throw new IllegalArgumentException("Unknown EC curve: %s".formatted(curveName));
       };
     } catch (NoSuchAlgorithmException | InvalidParameterSpecException e) {
       throw new IllegalStateException("EC algorithm or needed curves unavailable.", e);

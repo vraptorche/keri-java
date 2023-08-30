@@ -20,58 +20,58 @@ import static java.util.Objects.requireNonNull;
 
 public final class ImmutableInceptionEvent extends AbstractImmutableEstablishmentEvent implements InceptionEvent {
 
-  private final byte[] inceptionStatement;
-  private final List<BasicIdentifier> witnesses;
-  private final Set<ConfigurationTrait> configurationTraits;
+    private final byte[] inceptionStatement;
+    private final List<BasicIdentifier> witnesses;
+    private final Set<ConfigurationTrait> configurationTraits;
 
-  public ImmutableInceptionEvent(
-      byte[] bytes,
-      byte[] inceptionStatement,
-      Version version,
-      Format format,
-      Identifier identifier,
-      SigningThreshold signingThreshold,
-      List<PublicKey> keys,
-      KeyConfigurationDigest nextKeys,
-      int witnessThreshold,
-      List<BasicIdentifier> witnesses,
-      Set<ConfigurationTrait> configurationTraits,
-      Map<Integer, Signature> signatures,
-      Map<Integer, Signature> receipts,
-      Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
-    super(
-        new KeyEventDetails(version,
-            format,
-            identifier,
-            0L),
-        KeyEventCoordinates.NONE,
-        signingThreshold,
-        keys,
-        nextKeys,
-        witnessThreshold,
-        bytes,
-        signatures,
-        receipts,
-        otherReceipts
-    );
-    this.inceptionStatement = requireNonNull(inceptionStatement, "inceptionStatement").clone();
-    this.witnesses = List.copyOf(requireNonNull(witnesses, "witnesses"));
-    this.configurationTraits = Set.copyOf(requireNonNull(configurationTraits, "configurationTraits"));
-  }
+    public ImmutableInceptionEvent(
+            byte[] bytes,
+            byte[] inceptionStatement,
+            Version version,
+            Format format,
+            Identifier identifier,
+            SigningThreshold signingThreshold,
+            List<PublicKey> keys,
+            KeyConfigurationDigest nextKeys,
+            int witnessThreshold,
+            List<BasicIdentifier> witnesses,
+            Set<ConfigurationTrait> configurationTraits,
+            Map<Integer, Signature> signatures,
+            Map<Integer, Signature> receipts,
+            Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
+        super(
+                new KeyEventDetails(version,
+                        format,
+                        identifier,
+                        0L),
+                KeyEventCoordinates.NONE,
+                signingThreshold,
+                keys,
+                nextKeys,
+                witnessThreshold,
+                bytes,
+                signatures,
+                receipts,
+                otherReceipts
+        );
+        this.inceptionStatement = requireNonNull(inceptionStatement, "inceptionStatement").clone();
+        this.witnesses = List.copyOf(requireNonNull(witnesses, "witnesses"));
+        this.configurationTraits = Set.copyOf(requireNonNull(configurationTraits, "configurationTraits"));
+    }
 
-  @Override
-  public byte[] inceptionStatement() {
-    return this.inceptionStatement.clone();
-  }
+    @Override
+    public byte[] inceptionStatement() {
+        return this.inceptionStatement.clone();
+    }
 
-  @Override
-  public List<BasicIdentifier> witnesses() {
-    return this.witnesses;
-  }
+    @Override
+    public List<BasicIdentifier> witnesses() {
+        return this.witnesses;
+    }
 
-  @Override
-  public Set<ConfigurationTrait> configurationTraits() {
-    return this.configurationTraits;
-  }
+    @Override
+    public Set<ConfigurationTrait> configurationTraits() {
+        return this.configurationTraits;
+    }
 
 }

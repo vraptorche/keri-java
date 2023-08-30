@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 	ECParameterSpec parameterSpec;
 
-	@BeforeAll
-	 static void beforeClass() {
-		// secp256k1 is considered "unsecure" so you have enable it like this:
-		System.setProperty("jdk.sunec.disableNative", "false");
-	}
+//	@BeforeAll
+//	 static void beforeClass() {
+//		// secp256k1 is considered "unsecure" so you have enable it like this:
+//		System.setProperty("jdk.sunec.disableNative", "false");
+//	}
 
 	@BeforeEach
 	 void setUp() throws GeneralSecurityException {

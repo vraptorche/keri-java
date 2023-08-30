@@ -9,7 +9,7 @@ import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.crypto.DigestOperations;
 import foundation.identity.keri.eventstorage.inmemory.InMemoryKeyEventStore;
 import foundation.identity.keri.internal.event.KeyCoordinatesRecord;
-import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
+import foundation.identity.keri.internal.seal.DigestSealRecord;
 import foundation.identity.keri.internal.seal.KeyEventCoordinatesSealRecord;
 import foundation.identity.keri.internal.seal.MerkleTreeRootSealRecord;
 import foundation.identity.keri.keystorage.inmemory.InMemoryIdentifierKeyStore;
@@ -29,12 +29,6 @@ public class ControllerTests {
     SecureRandom secureRandom = new SecureRandom(new byte[]{0});
     final InMemoryKeyEventStore testEventStore = new InMemoryKeyEventStore();
     final InMemoryIdentifierKeyStore testKeyStore = new InMemoryIdentifierKeyStore();
-
-    @BeforeAll
-    public static void beforeClass() {
-        // secp256k1 is considered "unsecure" so you have enable it like this:
-        System.setProperty("jdk.sunec.disableNative", "false");
-    }
 
     @BeforeEach
     public void beforeEachTest() throws NoSuchAlgorithmException {
@@ -115,7 +109,7 @@ public class ControllerTests {
 
         i.rotate(
                 List.of(
-                        new ImmutableDigestSeal(digest),
+                        new DigestSealRecord(digest),
                         new MerkleTreeRootSealRecord(digest),
                         new KeyEventCoordinatesSealRecord(event)
                 ));
@@ -132,7 +126,7 @@ public class ControllerTests {
         var digest = DigestOperations.BLAKE3_256.digest("digest seal".getBytes());
         var event = KeyEventCoordinatesRecord.of(i.lastEstablishmentEvent());
         List<Seal> seals = List.of(
-                new ImmutableDigestSeal(digest),
+                new DigestSealRecord(digest),
                 new MerkleTreeRootSealRecord(digest),
                 new KeyEventCoordinatesSealRecord(event)
         );
@@ -143,4 +137,12 @@ public class ControllerTests {
         i.seal(seals);
     }
 
+    @Test
+    void test_publicIdentifier() {
+
+        var controller = new Controller(this.testEventStore, this.testKeyStore, this.secureRandom);
+        ControllableIdentifier id = controller.newPublicIdentifier();
+        id.rotate();
+
+    }
 }

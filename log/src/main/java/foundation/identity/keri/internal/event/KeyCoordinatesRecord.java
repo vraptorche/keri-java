@@ -8,7 +8,10 @@ import foundation.identity.keri.api.identifier.BasicIdentifier;
 
 import static java.util.Objects.requireNonNull;
 
-public record KeyCoordinatesRecord(KeyEventCoordinates establishmentEvent, int keyIndex) implements KeyCoordinates {
+public record KeyCoordinatesRecord(
+        KeyEventCoordinates establishmentEvent,
+        int keyIndex
+) implements KeyCoordinates {
 
     public KeyCoordinatesRecord(KeyEventCoordinates establishmentEvent, int keyIndex) {
         if (keyIndex < 0) {

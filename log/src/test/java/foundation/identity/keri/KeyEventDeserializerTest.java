@@ -19,7 +19,7 @@ class KeyEventDeserializerTest {
     final ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    void test__readSigningThreshold__unweighted() throws JsonProcessingException {
+    void test_readSigningThreshold_unweighted() throws JsonProcessingException {
         assertEquals(
                 unweighted(1),
                 readSigningThreshold(this.mapper.readTree("\"1\"")));

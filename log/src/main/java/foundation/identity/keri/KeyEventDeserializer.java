@@ -20,7 +20,7 @@ import foundation.identity.keri.internal.event.ImmutableInceptionEvent;
 import foundation.identity.keri.internal.event.ImmutableInteractionEvent;
 import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
 import foundation.identity.keri.internal.event.ImmutableRotationEvent;
-import foundation.identity.keri.internal.seal.ImmutableDigestSeal;
+import foundation.identity.keri.internal.seal.DigestSealRecord;
 import foundation.identity.keri.internal.seal.KeyEventCoordinatesSealRecord;
 import foundation.identity.keri.internal.seal.MerkleTreeRootSealRecord;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
@@ -283,7 +283,7 @@ public class KeyEventDeserializer {
         } else if (jsonNode.has("rd")) {
             return new MerkleTreeRootSealRecord(digest(jsonNode.get("rd").textValue()));
         } else if (jsonNode.has("d")) {
-            return new ImmutableDigestSeal(digest(jsonNode.get("d").textValue()));
+            return new DigestSealRecord(digest(jsonNode.get("d").textValue()));
         } else {
             return new UnknownSeal(jsonNode);
         }
@@ -375,17 +375,9 @@ public class KeyEventDeserializer {
         return null;
     }
 
-    public static class UnknownSeal implements Seal {
-
-        private final JsonNode jsonNode;
-
-        public UnknownSeal(JsonNode jsonNode) {
-            this.jsonNode = jsonNode;
-        }
-
-        public JsonNode jsonNode() {
-            return this.jsonNode;
-        }
+    public record UnknownSeal(
+            JsonNode jsonNode
+    ) implements Seal {
 
     }
 

@@ -1,14 +1,11 @@
 package foundation.identity.keri.internal.event;
 
-import foundation.identity.keri.api.Version;
 import foundation.identity.keri.api.event.DelegatedRotationEvent;
 import foundation.identity.keri.api.event.DelegatingEventCoordinates;
-import foundation.identity.keri.api.event.Format;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.KeyEventCoordinates;
 import foundation.identity.keri.api.event.SigningThreshold;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
-import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.seal.Seal;
 import foundation.identity.keri.crypto.Signature;
 

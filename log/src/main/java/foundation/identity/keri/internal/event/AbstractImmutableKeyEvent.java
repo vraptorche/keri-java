@@ -16,94 +16,88 @@ import static java.util.Objects.requireNonNull;
 
 public abstract class AbstractImmutableKeyEvent implements KeyEvent {
 
-  private final KeyEventDetails eventDetails;
-  private final byte[] bytes;
-  private final KeyEventCoordinates previous;
-  private final Map<Integer, Signature> signatures;
-  private final Map<Integer, Signature> receipts;
-  private final Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts;
+    private final KeyEventDetails eventDetails;
+    private final byte[] bytes;
+    private final KeyEventCoordinates previous;
+    private final Map<Integer, Signature> signatures;
+    private final Map<Integer, Signature> receipts;
+    private final Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts;
 
-  // for lazily computing the event's coordinates
-  private Supplier<KeyEventCoordinates> coordinates = () -> {
-    // with multiple threads this might be ran multiple times concurrently, and that's ok
-    var keyEventCoordinates = KeyEventCoordinatesRecord.of(this);
-    this.coordinates = () -> keyEventCoordinates;
-    return keyEventCoordinates;
-  };
+    // for lazily computing the event's coordinates
+    private Supplier<KeyEventCoordinates> coordinates = () -> {
+        // with multiple threads this might be ran multiple times concurrently, and that's ok
+        var keyEventCoordinates = KeyEventCoordinatesRecord.of(this);
+        this.coordinates = () -> keyEventCoordinates;
+        return keyEventCoordinates;
+    };
 
-  public AbstractImmutableKeyEvent(
-      KeyEventDetails eventDetails, KeyEventCoordinates previous,
-      byte[] bytes,
-      Map<Integer, Signature> signatures,
-      Map<Integer, Signature> receipts,
-      Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
-    this.eventDetails = eventDetails;
-    this.bytes = requireNonNull(bytes, "bytes");
-    this.previous = requireNonNull(previous, "previous");
-    this.signatures = Map.copyOf(requireNonNull(signatures, "signatures"));
-    this.receipts = Map.copyOf(requireNonNull(receipts, "receipts"));
-    this.otherReceipts = Map.copyOf(requireNonNull(otherReceipts, "otherReceipts"));
-  }
+    public AbstractImmutableKeyEvent(
+            KeyEventDetails eventDetails, KeyEventCoordinates previous,
+            byte[] bytes,
+            Map<Integer, Signature> signatures,
+            Map<Integer, Signature> receipts,
+            Map<KeyEventCoordinates, Map<Integer, Signature>> otherReceipts) {
+        this.eventDetails = eventDetails;
+        this.bytes = requireNonNull(bytes, "bytes");
+        this.previous = requireNonNull(previous, "previous");
+        this.signatures = Map.copyOf(requireNonNull(signatures, "signatures"));
+        this.receipts = Map.copyOf(requireNonNull(receipts, "receipts"));
+        this.otherReceipts = Map.copyOf(requireNonNull(otherReceipts, "otherReceipts"));
+    }
 
-  @Override
-  public Version version() {
-    return this.eventDetails.version();
-  }
+    @Override
+    public Version version() {
+        return this.eventDetails.version();
+    }
 
-  @Override
-  public Format format() {
-    return this.eventDetails.format();
-  }
+    @Override
+    public Format format() {
+        return this.eventDetails.format();
+    }
 
-  @Override
-  public byte[] bytes() {
-    return this.bytes.clone();
-  }
+    @Override
+    public byte[] bytes() {
+        return this.bytes.clone();
+    }
 
-  @Override
-  public Identifier identifier() {
-    return this.eventDetails.identifier();
-  }
+    @Override
+    public Identifier identifier() {
+        return this.eventDetails.identifier();
+    }
 
-  @Override
-  public long sequenceNumber() {
-    return this.eventDetails.sequenceNumber();
-  }
+    @Override
+    public long sequenceNumber() {
+        return this.eventDetails.sequenceNumber();
+    }
 
-  @Override
-  public KeyEventCoordinates coordinates() {
-    return this.coordinates.get();
-  }
+    @Override
+    public KeyEventCoordinates coordinates() {
+        return this.coordinates.get();
+    }
 
-  @Override
-  public KeyEventCoordinates previous() {
-    return this.previous;
-  }
+    @Override
+    public KeyEventCoordinates previous() {
+        return this.previous;
+    }
 
-  @Override
-  public Map<Integer, Signature> authentication() {
-    return this.signatures;
-  }
+    @Override
+    public Map<Integer, Signature> authentication() {
+        return this.signatures;
+    }
 
-  @Override
-  public Map<Integer, Signature> endorsements() {
-    return this.receipts;
-  }
+    @Override
+    public Map<Integer, Signature> endorsements() {
+        return this.receipts;
+    }
 
-  @Override
-  public Map<KeyEventCoordinates, Map<Integer, Signature>> receipts() {
-    return this.otherReceipts;
-  }
+    @Override
+    public Map<KeyEventCoordinates, Map<Integer, Signature>> receipts() {
+        return this.otherReceipts;
+    }
 
-  @Override
-  public String toString() {
-    return KeyEvents.toString(this);
-  }
+    @Override
+    public String toString() {
+        return KeyEvents.toString(this);
+    }
 
-  record KeyEventDetails(
-      Version version,
-      Format format,
-      Identifier identifier,
-      long sequenceNumber) {
-  }
 }

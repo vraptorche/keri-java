@@ -2,11 +2,7 @@ package foundation.identity.keri.controller.spec;
 
 import foundation.identity.keri.KeyConfigurationDigester;
 import foundation.identity.keri.SigningThresholds;
-import foundation.identity.keri.api.event.ConfigurationTrait;
-import foundation.identity.keri.api.event.Format;
-import foundation.identity.keri.api.event.KeyConfigurationDigest;
-import foundation.identity.keri.api.event.SigningThreshold;
-import foundation.identity.keri.api.event.StandardFormats;
+import foundation.identity.keri.api.event.*;
 import foundation.identity.keri.api.identifier.BasicIdentifier;
 import foundation.identity.keri.api.identifier.Identifier;
 import foundation.identity.keri.api.identifier.SelfAddressingIdentifier;
@@ -17,13 +13,10 @@ import foundation.identity.keri.crypto.StandardDigestAlgorithms;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
+import static foundation.identity.keri.api.event.KeyConfigurationDigest.NONE;
 import static java.util.Objects.requireNonNull;
 
 public class IdentifierSpec {
@@ -133,7 +126,7 @@ public class IdentifierSpec {
     private final DigestAlgorithm nextKeysAlgorithm = StandardDigestAlgorithms.BLAKE3_256;
     private final List<PublicKey> listOfNextKeys = new ArrayList<>();
     private final List<Digest> listOfNextKeyDigests = new ArrayList<>();
-    private KeyConfigurationDigest nextKeyConfigurationDigest = KeyConfigurationDigest.NONE;
+    private KeyConfigurationDigest nextKeyConfigurationDigest = NONE;
 
     private int witnessThreshold = 0;
     private final List<BasicIdentifier> witnesses = new ArrayList<>();
