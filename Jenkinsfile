@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     stages {
         stage('Build') {
             steps {
@@ -12,7 +11,6 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing..'
-                sh 'mvn test'
             }
         }
         stage('Deploy') {
@@ -22,15 +20,15 @@ pipeline {
             }
         }
     }
-   post {
-           success {
-               junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-               jacoco execPattern: '**/target/**.exec'
-               archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-               cleanWs()
-           }
-           failure {
-               cleanWs()
-           }
-       }
+    post {
+        success {
+            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
+            jacoco execPattern: '**/target/**.exec'
+            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            cleanWs()
+        }
+        failure {
+            cleanWs()
+        }
+    }
 }

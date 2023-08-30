@@ -18,9 +18,7 @@
     </licenses>
 
     <scm>
-        <developerConnection>https://github.com/vraptorche/keri-java.git</developerConnection>
-        <url>https://github.com/vraptorche/keri-java.git</url>
-        <connection>git://github.com/vraptorche/keri-java.git</connection>
+        <developerConnection>scm:git:ssh:git@github.com:vraptorche//keri-java.git</developerConnection>
     </scm>
 
     <issueManagement>
