@@ -23,7 +23,7 @@ pipeline {
     post {
         success {
             junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
-            jacoco execPattern: '**/target/**.exec'
+            jacoco execPattern: '**/target/*.exec'
             archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             cleanWs()
         }
