@@ -1,20 +1,23 @@
 package foundation.identity.keri.controller.spec;
 
+import foundation.identity.keri.KeyConfigurationDigester;
 import foundation.identity.keri.SigningThresholds;
 import foundation.identity.keri.api.event.KeyConfigurationDigest;
 import foundation.identity.keri.api.event.SigningThreshold;
-import foundation.identity.keri.crypto.Blake3Operations;
-import foundation.identity.keri.crypto.Digest;
-import foundation.identity.keri.crypto.SignatureOperations;
+import foundation.identity.keri.crypto.*;
 import foundation.identity.keri.internal.event.ImmutableKeyConfigurationDigest;
 import org.junit.jupiter.api.*;
 
 
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.util.List;
 
+import static foundation.identity.keri.SigningThresholds.unweighted;
 import static foundation.identity.keri.SigningThresholds.weight;
+import static foundation.identity.keri.crypto.StandardDigestAlgorithms.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DisplayNameGenerator.*;
@@ -82,19 +85,38 @@ class IdentifierSpecTests {
     }
 
     @Test
-    void name() {
+    void test_build_next_keys() {
         KeyPair nextKeyPair1 = SignatureOperations.ED_25519.generateKeyPair();
         KeyPair nextKeyPair2 = SignatureOperations.ED_25519.generateKeyPair();
 
         byte[] bytes1 = nextKeyPair1.getPublic().getEncoded();
         Digest digest = Blake3Operations.BLAKE3_512.digest(bytes1);
+
+        SigningThreshold.Weighted weighted = SigningThresholds.weighted("1", "2");
+        List<PublicKey> nextKeys = List.of(
+                nextKeyPair1.getPublic(), nextKeyPair2.getPublic()
+        );
+        KeyConfigurationDigester.digest(weighted, nextKeys, BLAKE3_512);
+
         KeyConfigurationDigest nextKeysDigest = new ImmutableKeyConfigurationDigest(digest);
         var spec = IdentifierSpec.builder()
                 .key(this.keyPair.getPublic())
                 .key(this.keyPair2.getPublic())
                 .nextKeys(nextKeysDigest)
                 .signer(this.signer)
-                .signingThreshold(SigningThresholds.weighted("1", "2"))
+                .signingThreshold(weighted)
+                .build();
+        assertEquals(BLAKE3_512, spec.nextKeys().algorithm());
+    }
+
+    @Test
+    void name() {
+        var spec = IdentifierSpec.builder()
+                .key(this.keyPair.getPublic())
+                .key(this.keyPair2.getPublic())
+                .selfAddressing(BLAKE3_512)
+                .signer(this.signer)
+                .signingThreshold(unweighted(1))
                 .build();
     }
 }
